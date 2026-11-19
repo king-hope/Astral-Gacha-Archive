@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111426">
+<title>Astral Gacha Archive</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#0d1020;--panel:#171b30;--panel2:#202641;--line:#343b5d;--text:#f2f3ff;--muted:#a6acc8;--gold:#e9c982;--purple:#a99aff;--red:#ff9aab}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#33315c 0,transparent 42%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Noto Sans TC",sans-serif}
+header{padding:22px 18px 12px;max-width:1050px;margin:auto}h1{font-size:24px;margin:0;color:var(--gold);letter-spacing:.04em}header p{margin:4px 0;color:var(--muted);font-size:13px}
+main{max-width:1050px;margin:auto;padding:12px 16px 100px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.pill{border:1px solid var(--line);border-radius:999px;padding:6px 11px;color:var(--muted);font-size:12px}
+nav{display:flex;gap:8px;overflow:auto;padding:12px 0 18px}nav button{white-space:nowrap}
+button,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer}button.primary{background:linear-gradient(135deg,#7567bd,#4c477d);border-color:#8b80d5}button.active{border-color:var(--gold);color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stat,.panel{background:linear-gradient(145deg,rgba(32,38,65,.96),rgba(21,25,44,.96));border:1px solid var(--line);border-radius:18px;padding:16px}.stat small,.muted{color:var(--muted)}.stat strong{display:block;font-size:27px;margin-top:5px;color:var(--gold);font-variant-numeric:tabular-nums}
+.panel{margin-top:14px}.panel h2{font-size:17px;margin:0 0 12px}.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+label{display:block;color:var(--muted);font-size:13px;margin:10px 0 5px}input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:#101529;color:var(--text);font:inherit}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.full{grid-column:1/-1}.hint{font-size:12px;color:var(--muted);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:500}.empty{padding:24px;text-align:center;color:var(--muted)}
+.hidden{display:none!important}.notice{padding:11px 13px;border-radius:12px;background:#2a2945;border:1px solid #514b7d;color:#d8d2ff;font-size:13px;margin-top:12px}
+.danger{color:var(--red)}footer{color:var(--muted);font-size:11px;text-align:center;padding:22px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:430px){main{padding-left:12px;padding-right:12px}.stat{padding:13px}.stat strong{font-size:23px}.panel{padding:13px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>✦ ASTRAL GACHA ARCHIVE</h1><p>星穹鐵道・個人抽卡紀錄</p></div><span class="pill" id="authStatus">尚未連接雲端</span></div></header>
+<main>
+<div class="row"><div class="muted" id="welcome">你的躍遷歷程，從這裡開始。</div><button id="loginBtn" class="primary">使用 Google 登入</button></div>
+<div class="notice" id="setupNotice">目前是展示／本機預覽模式。完成 README 中的 Supabase 設定後，即可啟用 Google 登入與跨裝置同步。</div>
+<nav>
+<button class="active" data-tab="overview">總覽</button><button data-tab="records">抽卡紀錄</button><button data-tab="add">新增五星</button><button data-tab="settings">設定</button>
+</nav>
+<section id="overview">
+<div class="grid">
+<div class="stat"><small>累計抽數</small><strong id="totalPulls">0</strong></div>
+<div class="stat"><small>五星取得</small><strong id="fiveCount">0</strong></div>
+<div class="stat"><small>歪卡次數</small><strong id="offCount">0</strong></div>
+<div class="stat"><small>平均出金抽數</small><strong id="avgPulls">—</strong></div>
+</div>
+<div class="panel"><h2>最近出金</h2><div id="recent" class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div></div>
+<div class="panel"><h2>保底狀態</h2><div id="pitySummary" class="muted">新增紀錄後，這裡會顯示各卡池目前累積抽數。</div><p class="hint">注意：此版本以「五星出金紀錄＋出金前抽數」推算保底；跨卡池繼承及歷史資料請依遊戲實際紀錄確認。</p></div>
+</section>
+<section id="records" class="hidden"><div class="panel"><div class="row"><h2>五星歷史紀錄</h2><select id="poolFilter" style="width:auto"><option value="all">全部卡池</option><option value="character">角色活動躍遷</option><option value="lightcone">光錐活動躍遷</option><option value="standard">常駐躍遷</option><option value="beginner">新手躍遷</option></select></div><div id="recordTable" class="empty">目前沒有資料。</div></div></section>
+<section id="add" class="hidden"><div class="panel"><h2>新增五星紀錄</h2>
+<form id="recordForm"><div class="formgrid">
+<div><label>取得日期</label><input type="date" id="date" required></div>
+<div><label>卡池類型</label><select id="pool"><option value="character">角色活動躍遷</option><option value="lightcone">光錐活動躍遷</option><option value="standard">常駐躍遷</option><option value="beginner">新手躍遷</option></select></div>
+<div><label>角色／光錐名稱</label><input id="itemName" placeholder="例如：遐蝶" required></div>
+<div><label>本次出金前累積抽數</label><input id="pity" type="number" min="1" max="90" placeholder="例如：78" required></div>
+<div><label>結果</label><select id="result"><option value="up">當期 UP／目標命中</option><option value="off">歪卡</option><option value="standard">常駐出金</option></select></div>
+<div><label>星魂／疊影（取得後）</label><input id="rank" type="number" min="0" max="6" value="0"></div>
+<div class="full"><label>備註（選填）</label><textarea id="notes" rows="2" placeholder="例如：使用星瓊兌換、版本活動期間取得……"></textarea></div>
+<div class="full"><button class="primary" type="submit">儲存紀錄</button></div>
+</div></form><p class="hint">抽數請填「這次五星出現前，該卡池距離上次五星／起始點累積的抽數」，不是帳號總抽數。若是第一次出金，從卡池開始計算。</p></div></section>
+<section id="settings" class="hidden"><div class="panel"><h2>帳號與資料</h2><p id="cloudInfo" class="muted">尚未設定 Supabase。請依照下載包內 README 設定專案網址與公開 anon key。</p><div class="row"><button id="exportBtn">匯出 JSON 備份</button><button id="exportCsvBtn">匯出 CSV</button><button id="logoutBtn">登出</button></div><p class="hint">資料匯出功能可在本機預覽模式使用。正式雲端版會依登入帳號讀取資料。</p></div><div class="panel"><h2>版本花費統計（下一階段）</h2><p class="muted">預計加入版本、購買項目、金額、幣別及免費／付費星瓊分流。此版先建立五星與保底紀錄核心。</p></div></section>
+<footer>Astral Gacha Archive · Personal project · Not affiliated with HoYoverse</footer>
+</main>
+<script>
+/* 1) 建立 Supabase 專案後，填入下方兩個值。anon key 可用於前端，切勿放 service_role key。 */
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
+const supabaseReady = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
+const client = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let records = JSON.parse(localStorage.getItem("aga_records") || "[]");
+let user = null;
+const poolNames={character:"角色活動躍遷",lightcone:"光錐活動躍遷",standard:"常駐躍遷",beginner:"新手躍遷"};
+const $=id=>document.getElementById(id);
+$("date").value=new Date().toISOString().slice(0,10);
+function saveLocal(){localStorage.setItem("aga_records",JSON.stringify(records));}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function render(){
+ const total=records.reduce((s,r)=>s+Number(r.pity||0),0), off=records.filter(r=>r.result==="off").length;
+ $("totalPulls").textContent=total.toLocaleString();$("fiveCount").textContent=records.length;$("offCount").textContent=off;
+ $("avgPulls").textContent=records.length?(total/records.length).toFixed(1):"—";
+ const sorted=[...records].sort((a,b)=>b.date.localeCompare(a.date));
+ $("recent").innerHTML=sorted.length?sorted.slice(0,5).map(r=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(r.item_name)}</b><div class="muted">${esc(r.date)} · ${poolNames[r.pool]}</div></div><span>${r.pity} 抽 · ${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</span></div>`).join(""):'<div class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div>';
+ const pools=["character","lightcone","standard","beginner"];
+ $("pitySummary").innerHTML=pools.map(p=>{let list=records.filter(r=>r.pool===p).sort((a,b)=>a.date.localeCompare(b.date));let last=list.at(-1);return `<div class="row" style="padding:7px 0"><span>${poolNames[p]}</span><b>${last?`最近出金：${last.pity} 抽`:"尚無紀錄"}</b></div>`}).join("");
+ renderTable();
+}
+function renderTable(){let f=$("poolFilter").value;let list=[...records].filter(r=>f==="all"||r.pool===f).sort((a,b)=>b.date.localeCompare(a.date));$("recordTable").innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>日期</th><th>卡池</th><th>名稱</th><th>抽數</th><th>結果</th><th>星魂／疊影</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.date)}</td><td>${poolNames[r.pool]}</td><td>${esc(r.item_name)}</td><td>${r.pity}</td><td>${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</td><td>${r.rank??0}</td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">目前沒有符合條件的資料。</div>'}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["overview","records","add","settings"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));}));
+$("poolFilter").addEventListener("change",renderTable);
+$("recordForm").addEventListener("submit",async e=>{e.preventDefault();let r={id:crypto.randomUUID(),date:$("date").value,pool:$("pool").value,item_name:$("itemName").value.trim(),pity:Number($("pity").value),result:$("result").value,rank:Number($("rank").value||0),notes:$("notes").value.trim(),created_at:new Date().toISOString()};
+ if(user&&client){const {error}=await client.from("gacha_records").insert({...r,user_id:user.id});if(error){alert("雲端儲存失敗："+error.message);return;}}
+ records.push(r);saveLocal();e.target.reset();$("date").value=new Date().toISOString().slice(0,10);$("rank").value=0;render();document.querySelector('[data-tab="overview"]').click();});
+$("exportBtn").addEventListener("click",()=>download("astral-gacha-backup.json",JSON.stringify(records,null,2),"application/json"));
+$("exportCsvBtn").addEventListener("click",()=>{let cols=["date","pool","item_name","pity","result","rank","notes"];let csv=[cols.join(","),...records.map(r=>cols.map(c=>'"'+String(r[c]??"").replaceAll('"','""')+'"').join(","))].join("\n");download("astral-gacha-records.csv","\ufeff"+csv,"text/csv;charset=utf-8");});
+function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
+async function init(){if(!supabaseReady){$("authStatus").textContent="本機預覽";return;}
+ const {data:{session}}=await client.auth.getSession();user=session?.user||null;updateAuth();
+ client.auth.onAuthStateChange(async(_event,session)=>{user=session?.user||null;updateAuth();if(user)await loadCloud();});
+ if(user)await loadCloud();
+}
+function updateAuth(){$("authStatus").textContent=user?"已登入雲端":"尚未登入";$("welcome").textContent=user?`已登入：${user.email||"Google 帳號"}`:"你的躍遷歷程，從這裡開始。";$("loginBtn").textContent=user?"已使用 Google 登入":"使用 Google 登入";$("loginBtn").disabled=!!user;$("logoutBtn").disabled=!user;$("setupNotice").classList.toggle("hidden",!!user);$("cloudInfo").textContent=user?"已連接 Supabase，資料會同步至雲端。":"尚未登入雲端帳號。";}
+async function loadCloud(){const {data,error}=await client.from("gacha_records").select("*").order("date",{ascending:false});if(error){$("cloudInfo").textContent="讀取雲端資料失敗："+error.message;return;}records=data||[];saveLocal();render();}
+$("loginBtn").addEventListener("click",async()=>{if(!client){alert("請先依 README 設定 Supabase URL 與 anon key。");return;}const {error}=await client.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.href}});if(error)alert(error.message);});
+$("logoutBtn").addEventListener("click",async()=>{if(client&&user)await client.auth.signOut();user=null;updateAuth();});
+render();init();
+</script>
+</body></html>
