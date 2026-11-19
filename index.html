@@ -59,7 +59,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 </main>
 <script>
 /* 1) 建立 Supabase 專案後，填入下方兩個值。anon key 可用於前端，切勿放 service_role key。 */
-const SUPABASE_URL = "https://vpsicgfmzlgpmjxwaaop.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://vpsicgfmzlgpmjxwaaop.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_zqIpVlyQQAEBD3dITGviQA_EzeFKLap";
 const supabaseReady = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
 const client = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
