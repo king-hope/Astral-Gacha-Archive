@@ -92,7 +92,7 @@ async function editRecord(id){
  if(!poolNames[pool]){alert("卡池代碼不正確，請使用 character、lightcone、standard 或 beginner。");return;}
  const item_name=prompt("角色／光錐名稱",r.item_name); if(item_name===null)return;
  const pityText=prompt("本次出金前累積抽數（1–90）",String(r.pity)); if(pityText===null)return;
- const pity=Number(pityText); if(!/^\d{4}-\\d{2}-\\d{2}$/.test(date)||!item_name.trim()||!Number.isInteger(pity)||pity<1||pity>90){alert("資料格式不正確，請確認日期、名稱及抽數。");return;}
+ const pity=Number(pityText); if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!item_name.trim()||!Number.isInteger(pity)||pity<1||pity>90){alert("資料格式不正確，請確認日期、名稱及抽數。");return;}
  const result=prompt("結果：up／off／standard",r.result); if(result===null)return;
  if(!["up","off","standard"].includes(result)){alert("結果代碼不正確，請使用 up、off 或 standard。");return;}
  const rankText=prompt("星魂／疊影（0–6）",String(r.rank??0)); if(rankText===null)return;
