@@ -33,6 +33,14 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <button class="active" data-tab="overview">總覽</button><button data-tab="records">抽卡紀錄</button><button data-tab="add">新增五星</button><button data-tab="settings">設定</button>
 </nav>
 <section id="overview">
+<div class="panel">
+  <h2>卡池統計</h2>
+  <div class="row" id="statsPoolTabs">
+    <button type="button" class="active" data-stats-pool="character">角色活動</button>
+    <button type="button" data-stats-pool="lightcone">光錐活動</button>
+    <button type="button" data-stats-pool="standard">常駐</button>
+  </div>
+</div>
 <div class="grid">
 <div class="stat"><small>累計抽數</small><strong id="totalPulls">0</strong></div>
 <div class="stat"><small>五星取得</small><strong id="fiveCount">0</strong></div>
