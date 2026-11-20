@@ -100,6 +100,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_zqIpVlyQQAEBD3dITGviQA_EzeFKLap";
 const supabaseReady = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
 const client = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let records = JSON.parse(localStorage.getItem("aga_records") || "[]");
+let poolStates = {};
 let user = null;
 const poolNames={character:"角色活動躍遷",lightcone:"光錐活動躍遷",standard:"常駐躍遷",beginner:"新手躍遷"};
 const $=id=>document.getElementById(id);
@@ -113,7 +114,18 @@ function render(){
  const sorted=[...records].sort((a,b)=>b.date.localeCompare(a.date));
  $("recent").innerHTML=sorted.length?sorted.slice(0,5).map(r=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(r.item_name)}</b><div class="muted">${esc(r.date)} · ${poolNames[r.pool]}</div></div><span>${r.pity} 抽 · ${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</span></div>`).join(""):'<div class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div>';
  const pools=["character","lightcone","standard","beginner"];
- $("pitySummary").innerHTML=pools.map(p=>{let list=records.filter(r=>r.pool===p).sort((a,b)=>a.date.localeCompare(b.date));let last=list.at(-1);return `<div class="row" style="padding:7px 0"><span>${poolNames[p]}</span><b>${last?`最近出金：${last.pity} 抽`:"尚無紀錄"}</b></div>`}).join("");
+
+$("pitySummary").innerHTML=pools.map(p=>{
+  const state=poolStates[p];
+  const limit=p==="lightcone"?80:p==="beginner"?50:90;
+
+  return `<div class="row" style="padding:7px 0">
+    <span>${poolNames[p]}</span>
+    <b>${state
+      ? `目前 ${state.current_pity} 抽 · ${p==="character"||p==="lightcone"?(state.guaranteed?"大保底":"小保底"):"無大小保底"}`
+      : "尚未設定"}</b>
+  </div>`;
+}).join("");
  renderTable();
 }
 function renderTable(){
@@ -234,7 +246,36 @@ async function init(){if(!supabaseReady){$("authStatus").textContent="本機預�
  if(user)await loadCloud();
 }
 function updateAuth(){$("authStatus").textContent=user?"已登入雲端":"尚未登入";$("welcome").textContent=user?`已登入：${user.email||"Google 帳號"}`:"你的躍遷歷程，從這裡開始。";$("loginBtn").textContent=user?"已使用 Google 登入":"使用 Google 登入";$("loginBtn").disabled=!!user;$("logoutBtn").disabled=!user;$("setupNotice").classList.toggle("hidden",!!user);$("cloudInfo").textContent=user?"已連接 Supabase，資料會同步至雲端。":"尚未登入雲端帳號。";}
-async function loadCloud(){const {data,error}=await client.from("gacha_records").select("*").order("date",{ascending:false});if(error){$("cloudInfo").textContent="讀取雲端資料失敗："+error.message;return;}records=data||[];saveLocal();render();}
+async function loadCloud(){
+  const {data,error}=await client
+    .from("gacha_records")
+    .select("*")
+    .order("date",{ascending:false});
+
+  if(error){
+    $("cloudInfo").textContent="讀取雲端資料失敗："+error.message;
+    return;
+  }
+
+  records=data||[];
+  saveLocal();
+
+  const {data:states,error:stateError}=await client
+    .from("gacha_pool_states")
+    .select("*");
+
+  if(stateError){
+    $("cloudInfo").textContent="讀取保底狀態失敗："+stateError.message;
+    return;
+  }
+
+  poolStates={};
+  (states||[]).forEach(state=>{
+    poolStates[state.pool]=state;
+  });
+
+  render();
+}
 $("loginBtn").addEventListener("click",async()=>{if(!client){alert("請先依 README 設定 Supabase URL 與 anon key。");return;}const {error}=await client.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.href}});if(error)alert(error.message);});
 $("logoutBtn").addEventListener("click",async()=>{if(client&&user)await client.auth.signOut();user=null;updateAuth();});
 render();init();
