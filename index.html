@@ -357,8 +357,12 @@ function renderChart(){
               </div>
             </div>
 
-            <div style="height:14px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:10px;">
-              <div style="height:100%;width:${pity/90*100}%;background:${color};border-radius:99px;"></div>
+            <div style="height:14px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:10px;position:relative;">
+  <div style="height:100%;width:${pity/90*100}%;background:${color};border-radius:99px;"></div>
+
+  <div style="position:absolute;left:33.333%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45);"></div>
+  <div style="position:absolute;left:66.666%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45);"></div>
+</div>
             </div>
           </div>
         `;
