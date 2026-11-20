@@ -163,6 +163,71 @@ $("recordForm").addEventListener("submit",async e=>{e.preventDefault();let r={id
 $("exportBtn").addEventListener("click",()=>download("astral-gacha-backup.json",JSON.stringify(records,null,2),"application/json"));
 $("exportCsvBtn").addEventListener("click",()=>{let cols=["date","pool","item_name","pity","result","rank","notes"];let csv=[cols.join(","),...records.map(r=>cols.map(c=>'"'+String(r[c]??"").replaceAll('"','""')+'"').join(","))].join("\n");download("astral-gacha-records.csv","\ufeff"+csv,"text/csv;charset=utf-8");});
 function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
+const pityLimits = {
+  character: 89,
+  lightcone: 79,
+  standard: 89,
+  beginner: 49
+};
+
+$("statePool").addEventListener("change", () => {
+  const pool = $("statePool").value;
+  $("currentPity").max = pityLimits[pool];
+  if (Number($("currentPity").value) > pityLimits[pool]) {
+    $("currentPity").value = pityLimits[pool];
+  }
+
+  if (pool === "standard" || pool === "beginner") {
+    $("guaranteed").value = "false";
+    $("guaranteed").disabled = true;
+  } else {
+    $("guaranteed").disabled = false;
+  }
+});
+
+$("poolStateForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  if (!user || !client) {
+    alert("請先使用 Google 登入，再儲存保底狀態。");
+    return;
+  }
+
+  const pool = $("statePool").value;
+  const currentPity = Number($("currentPity").value);
+  const guaranteed = $("guaranteed").value === "true";
+
+  if (
+    !Number.isInteger(currentPity) ||
+    currentPity < 0 ||
+    currentPity > pityLimits[pool]
+  ) {
+    alert("累積抽數超出該卡池允許的範圍。");
+    return;
+  }
+
+  const { error } = await client
+    .from("gacha_pool_states")
+    .upsert({
+      user_id: user.id,
+      pool,
+      current_pity: currentPity,
+      guaranteed:
+        pool === "character" || pool === "lightcone"
+          ? guaranteed
+          : false,
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: "user_id,pool"
+    });
+
+  if (error) {
+    alert("保底狀態儲存失敗：" + error.message);
+    return;
+  }
+
+  alert("保底狀態已成功儲存至雲端！");
+});
 async function init(){if(!supabaseReady){$("authStatus").textContent="本機預覽";return;}
  const {data:{session}}=await client.auth.getSession();user=session?.user||null;updateAuth();
  client.auth.onAuthStateChange(async(_event,session)=>{user=session?.user||null;updateAuth();if(user)await loadCloud();});
