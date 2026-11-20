@@ -159,6 +159,10 @@ const SUPABASE_ANON_KEY = "sb_publishable_zqIpVlyQQAEBD3dITGviQA_EzeFKLap";
 const supabaseReady = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
 const client = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let records = JSON.parse(localStorage.getItem("aga_records") || "[]");
+let gameAssets = {
+  characters: {},
+  lightCones: {}
+};
 let poolStates = {};
 let selectedStatsPool = "character";
 let user = null;
