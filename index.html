@@ -53,7 +53,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
           <option value="character">角色活動躍遷</option>
           <option value="lightcone">光錐活動躍遷</option>
           <option value="standard">常駐躍遷</option>
-          <option value="beginner">新手躍遷</option>
         </select>
       </div>
 
@@ -78,11 +77,11 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 </div>
 
 </section>
-<section id="records" class="hidden"><div class="panel"><div class="row"><h2>五星歷史紀錄</h2><select id="poolFilter" style="width:auto"><option value="all">全部卡池</option><option value="character">角色活動躍遷</option><option value="lightcone">光錐活動躍遷</option><option value="standard">常駐躍遷</option><option value="beginner">新手躍遷</option></select></div><div id="recordTable" class="empty">目前沒有資料。</div></div></section>
+<section id="records" class="hidden"><div class="panel"><div class="row"><h2>五星歷史紀錄</h2><select id="poolFilter" style="width:auto"><option value="all">全部卡池</option><option value="character">角色活動躍遷</option><option value="lightcone">光錐活動躍遷</option><option value="standard">常駐躍遷</option></select></div><div id="recordTable" class="empty">目前沒有資料。</div></div></section>
 <section id="add" class="hidden"><div class="panel"><h2>新增五星紀錄</h2>
 <form id="recordForm"><div class="formgrid">
 <div><label>取得日期</label><input type="date" id="date" required></div>
-<div><label>卡池類型</label><select id="pool"><option value="character">角色活動躍遷</option><option value="lightcone">光錐活動躍遷</option><option value="standard">常駐躍遷</option><option value="beginner">新手躍遷</option></select></div>
+<div><label>卡池類型</label><select id="pool"><option value="character">角色活動躍遷</option><option value="lightcone">光錐活動躍遷</option><option value="standard">常駐躍遷</option></select></div>
 <div><label>角色／光錐名稱</label><input id="itemName" placeholder="例如：遐蝶" required></div>
 <div><label>本次出金前累積抽數</label><input id="pity" type="number" min="1" max="90" placeholder="例如：78" required></div>
 <div><label>結果</label><select id="result"><option value="up">當期 UP／目標命中</option><option value="off">歪卡</option><option value="standard">常駐出金</option></select></div>
@@ -102,7 +101,11 @@ const client = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABA
 let records = JSON.parse(localStorage.getItem("aga_records") || "[]");
 let poolStates = {};
 let user = null;
-const poolNames={character:"角色活動躍遷",lightcone:"光錐活動躍遷",standard:"常駐躍遷",beginner:"新手躍遷"};
+const poolNames={
+  character:"角色活動躍遷",
+  lightcone:"光錐活動躍遷",
+  standard:"常駐躍遷"
+};
 const $=id=>document.getElementById(id);
 $("date").value=new Date().toISOString().slice(0,10);
 function saveLocal(){localStorage.setItem("aga_records",JSON.stringify(records));}
@@ -113,11 +116,11 @@ function render(){
  $("avgPulls").textContent=records.length?(total/records.length).toFixed(1):"—";
  const sorted=[...records].sort((a,b)=>b.date.localeCompare(a.date));
  $("recent").innerHTML=sorted.length?sorted.slice(0,5).map(r=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(r.item_name)}</b><div class="muted">${esc(r.date)} · ${poolNames[r.pool]}</div></div><span>${r.pity} 抽 · ${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</span></div>`).join(""):'<div class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div>';
- const pools=["character","lightcone","standard","beginner"];
+ const pools=["character","lightcone","standard"];
 
 $("pitySummary").innerHTML=pools.map(p=>{
   const state=poolStates[p];
-  const limit=p==="lightcone"?80:p==="beginner"?50:90;
+  const limit=p==="lightcone"?80:90;
 
   if (!state) {
     return `<div class="row" style="padding:7px 0">
@@ -152,8 +155,8 @@ function renderTable(){
 async function editRecord(id){
  const r=records.find(x=>String(x.id)===String(id)); if(!r)return;
  const date=prompt("取得日期（YYYY-MM-DD）",r.date); if(date===null)return;
- const pool=prompt("卡池：character／lightcone／standard／beginner",r.pool); if(pool===null)return;
- if(!poolNames[pool]){alert("卡池代碼不正確，請使用 character、lightcone、standard 或 beginner。");return;}
+ const pool=prompt("卡池：character／lightcone／standard",r.pool); if(pool===null)return;
+ if(!poolNames[pool]){alert("卡池代碼不正確，請使用 character、lightcone 或 standard");return;}
  const item_name=prompt("角色／光錐名稱",r.item_name); if(item_name===null)return;
  const pityText=prompt("本次出金前累積抽數（1–90）",String(r.pity)); if(pityText===null)return;
  const pity=Number(pityText); if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!item_name.trim()||!Number.isInteger(pity)||pity<1||pity>90){alert("資料格式不正確，請確認日期、名稱及抽數。");return;}
@@ -194,8 +197,7 @@ function download(name,data,type){let a=document.createElement("a"),url=URL.crea
 const pityLimits = {
   character: 89,
   lightcone: 79,
-  standard: 89,
-  beginner: 49
+  standard: 89
 };
 
 $("statePool").addEventListener("change", () => {
@@ -205,7 +207,7 @@ $("statePool").addEventListener("change", () => {
     $("currentPity").value = pityLimits[pool];
   }
 
-  if (pool === "standard" || pool === "beginner") {
+  if (pool === "standard")  {
     $("guaranteed").value = "false";
     $("guaranteed").disabled = true;
   } else {
