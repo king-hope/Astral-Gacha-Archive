@@ -163,6 +163,35 @@ $("avgPulls").textContent = poolRecords.length
 
  $("minPity").textContent = minPity || "—";
  $("maxPity").textContent = maxPity || "—";
+ const resultTypes = selectedStatsPool === "standard"
+  ? [
+      { key: "standard", label: "常駐出金" }
+    ]
+  : [
+      { key: "up", label: "當期 UP／目標命中" },
+      { key: "off", label: "歪卡" }
+    ];
+
+const resultTotal = poolRecords.length;
+
+$("statsResultDistribution").innerHTML = resultTotal
+  ? resultTypes.map(item => {
+      const count = poolRecords.filter(r => r.result === item.key).length;
+      const percent = count / resultTotal * 100;
+
+      return `
+        <div style="margin: 12px 0;">
+          <div style="display:flex; justify-content:space-between; gap:12px;">
+            <span>${item.label}</span>
+            <strong>${count} 次（${percent.toFixed(1)}%）</strong>
+          </div>
+          <div style="height:8px; background:var(--border); border-radius:99px; overflow:hidden; margin-top:6px;">
+            <div style="height:100%; width:${percent}%; background:var(--accent); border-radius:99px;"></div>
+          </div>
+        </div>
+      `;
+    }).join("")
+  : '<p class="muted">尚無五星紀錄</p>'; 
  const sorted=[...records].sort((a,b)=>b.date.localeCompare(a.date));
  $("recent").innerHTML=sorted.length?sorted.slice(0,5).map(r=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(r.item_name)}</b><div class="muted">${esc(r.date)} · ${poolNames[r.pool]}</div></div><span>${r.pity} 抽 · ${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</span></div>`).join(""):'<div class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div>';
  const pools=["character","lightcone","standard"];
