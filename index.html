@@ -116,7 +116,28 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 </div>
 
 </section>
-<section id="records" class="hidden"><div class="panel"><div class="row"><h2>五星歷史紀錄</h2><select id="poolFilter" style="width:auto"><option value="all">全部卡池</option><option value="character">角色活動躍遷</option><option value="lightcone">光錐活動躍遷</option><option value="standard">常駐躍遷</option></select></div><div id="recordTable" class="empty">目前沒有資料。</div></div></section>
+
+<section id="records" class="hidden">
+  <div class="panel">
+    <div class="row">
+      <h2>五星歷史紀錄</h2>
+      <select id="poolFilter" style="width:auto">
+        <option value="all">全部卡池</option>
+        <option value="character">角色活動躍遷</option>
+        <option value="lightcone">光錐活動躍遷</option>
+        <option value="standard">常駐躍遷</option>
+      </select>
+    </div>
+
+    <div class="row" style="margin:12px 0;">
+      <button type="button" id="showTableBtn">表格</button>
+      <button type="button" id="showChartBtn">抽卡圖表</button>
+    </div>
+
+    <div id="recordTable" class="empty">目前沒有資料。</div>
+    <div id="recordChart" class="hidden"></div>
+  </div>
+</section>
 <section id="add" class="hidden"><div class="panel"><h2>新增五星紀錄</h2>
 <form id="recordForm"><div class="formgrid">
 <div><label>取得日期</label><input type="date" id="date" required></div>
