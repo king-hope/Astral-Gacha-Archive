@@ -195,6 +195,15 @@ $("statePool").addEventListener("change", () => {
   } else {
     $("guaranteed").disabled = false;
   }
+  const savedState = poolStates[pool];
+
+if (savedState) {
+  $("currentPity").value = savedState.current_pity;
+  $("guaranteed").value = String(savedState.guaranteed);
+} else {
+  $("currentPity").value = 0;
+  $("guaranteed").value = "false";
+}
 });
 
 $("poolStateForm").addEventListener("submit", async e => {
