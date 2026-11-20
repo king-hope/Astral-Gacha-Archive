@@ -119,11 +119,27 @@ $("pitySummary").innerHTML=pools.map(p=>{
   const state=poolStates[p];
   const limit=p==="lightcone"?80:p==="beginner"?50:90;
 
+  if (!state) {
+    return `<div class="row" style="padding:7px 0">
+      <span>${poolNames[p]}</span>
+      <b>尚未設定</b>
+    </div>`;
+  }
+
+  const remaining=Math.max(0,limit-state.current_pity);
+
+  const guaranteeText =
+    p==="character" || p==="lightcone"
+      ? (state.guaranteed?"大保底":"小保底")
+      : "無大小保底";
+
   return `<div class="row" style="padding:7px 0">
     <span>${poolNames[p]}</span>
-    <b>${state
-      ? `目前 ${state.current_pity} 抽 · ${p==="character"||p==="lightcone"?(state.guaranteed?"大保底":"小保底"):"無大小保底"}`
-      : "尚未設定"}</b>
+    <b>
+      目前 ${state.current_pity} 抽 · ${guaranteeText}
+      <br>
+      <small>距離下次五星最多 ${remaining} 抽</small>
+    </b>
   </div>`;
 }).join("");
  renderTable();
