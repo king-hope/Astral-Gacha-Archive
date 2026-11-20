@@ -768,18 +768,6 @@ async function init(){
   if(user)await loadCloud();
 }
 
-  records=data||[];
-  saveLocal();
-
-  const {data:states,error:stateError}=await client
-    .from("gacha_pool_states")
-    .select("*");
-
-  if(stateError){
-    $("cloudInfo").textContent="讀取保底狀態失敗："+stateError.message;
-    return;
-  }
-
   poolStates={};
   (states||[]).forEach(state=>{
     poolStates[state.pool]=state;
