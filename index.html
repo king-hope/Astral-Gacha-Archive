@@ -41,6 +41,42 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 </div>
 <div class="panel"><h2>最近出金</h2><div id="recent" class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div></div>
 <div class="panel"><h2>保底狀態</h2><div id="pitySummary" class="muted">新增紀錄後，這裡會顯示各卡池目前累積抽數。</div><p class="hint">注意：此版本以「五星出金紀錄＋出金前抽數」推算保底；跨卡池繼承及歷史資料請依遊戲實際紀錄確認。</p></div>
+<div class="panel">
+  <h2>手動校正保底</h2>
+  <p class="hint">如果你是第一次使用，或歷史紀錄不完整，可以在這裡設定目前的保底狀態。</p>
+
+  <form id="poolStateForm">
+    <div class="formgrid">
+      <div>
+        <label>要校正的卡池</label>
+        <select id="statePool">
+          <option value="character">角色活動躍遷</option>
+          <option value="lightcone">光錐活動躍遷</option>
+          <option value="standard">常駐躍遷</option>
+          <option value="beginner">新手躍遷</option>
+        </select>
+      </div>
+
+      <div>
+        <label>目前累積抽數</label>
+        <input id="currentPity" type="number" min="0" max="89" value="0" required>
+      </div>
+
+      <div>
+        <label>大小保底狀態</label>
+        <select id="guaranteed">
+          <option value="false">小保底／無保證</option>
+          <option value="true">大保底／下次必定命中</option>
+        </select>
+      </div>
+
+      <div class="full">
+        <button class="primary" type="submit">儲存保底狀態</button>
+      </div>
+    </div>
+  </form>
+</div>
+
 </section>
 <section id="records" class="hidden"><div class="panel"><div class="row"><h2>五星歷史紀錄</h2><select id="poolFilter" style="width:auto"><option value="all">全部卡池</option><option value="character">角色活動躍遷</option><option value="lightcone">光錐活動躍遷</option><option value="standard">常駐躍遷</option><option value="beginner">新手躍遷</option></select></div><div id="recordTable" class="empty">目前沒有資料。</div></div></section>
 <section id="add" class="hidden"><div class="panel"><h2>新增五星紀錄</h2>
