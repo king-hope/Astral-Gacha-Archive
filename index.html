@@ -130,10 +130,19 @@ const maxPity = poolRecords.length
 
 $("totalPulls").textContent = total.toLocaleString();
 $("fiveCount").textContent = poolRecords.length;
-$("offCountLabel").textContent =
-  selectedStatsPool === "standard" ? "最高出金抽數" : "歪卡次數";
-$("offCount").textContent =
-  selectedStatsPool === "standard" ? (maxPity || "—") : off;
+
+const upCount = poolRecords.filter(r => r.result === "up").length;
+const decidedCount = upCount + off;
+
+if (selectedStatsPool === "standard") {
+  $("offCountLabel").textContent = "最高出金抽數";
+  $("offCount").textContent = maxPity || "—";
+} else {
+  $("offCountLabel").textContent = "UP 命中率";
+  $("offCount").textContent = decidedCount
+    ? `${(upCount / decidedCount * 100).toFixed(1)}%`
+    : "—";
+}
 $("avgPulls").textContent = poolRecords.length
   ? (total / poolRecords.length).toFixed(1)
   : "—";
