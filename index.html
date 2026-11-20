@@ -50,6 +50,10 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
   <small>最低出金抽數</small>
   <strong id="minPity">—</strong>
 </div>
+<div class="stat">
+  <small>最高出金抽數</small>
+  <strong id="maxPity">—</strong>
+</div>
 </div>
 <div class="panel"><h2>最近出金</h2><div id="recent" class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div></div>
 <div class="panel"><h2>保底狀態</h2><div id="pitySummary" class="muted">新增紀錄後，這裡會顯示各卡池目前累積抽數。</div><p class="hint">注意：此版本以「五星出金紀錄＋出金前抽數」推算保底；跨卡池繼承及歷史資料請依遊戲實際紀錄確認。</p></div>
@@ -155,6 +159,7 @@ $("avgPulls").textContent = poolRecords.length
   : 0;
 
  $("minPity").textContent = minPity || "—";
+ $("maxPity").textContent = maxPity || "—";
  const sorted=[...records].sort((a,b)=>b.date.localeCompare(a.date));
  $("recent").innerHTML=sorted.length?sorted.slice(0,5).map(r=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(r.item_name)}</b><div class="muted">${esc(r.date)} · ${poolNames[r.pool]}</div></div><span>${r.pity} 抽 · ${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</span></div>`).join(""):'<div class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div>';
  const pools=["character","lightcone","standard"];
