@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <div class="grid">
 <div class="stat"><small>累計抽數</small><strong id="totalPulls">0</strong></div>
 <div class="stat"><small>五星取得</small><strong id="fiveCount">0</strong></div>
-<div class="stat"><small>歪卡次數</small><strong id="offCount">0</strong></div>
+<div class="stat"><small id="offCountLabel">歪卡次數</small><strong id="offCount">0</strong></div>
 <div class="stat"><small>平均出金抽數</small><strong id="avgPulls">—</strong></div>
 </div>
 <div class="panel"><h2>最近出金</h2><div id="recent" class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div></div>
@@ -120,9 +120,23 @@ $("date").value=new Date().toISOString().slice(0,10);
 function saveLocal(){localStorage.setItem("aga_records",JSON.stringify(records));}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function render(){
- const total=records.reduce((s,r)=>s+Number(r.pity||0),0), off=records.filter(r=>r.result==="off").length;
- $("totalPulls").textContent=total.toLocaleString();$("fiveCount").textContent=records.length;$("offCount").textContent=off;
- $("avgPulls").textContent=records.length?(total/records.length).toFixed(1):"—";
+ const poolRecords = records.filter(r => r.pool === selectedStatsPool);
+
+const total = poolRecords.reduce((s, r) => s + Number(r.pity || 0), 0);
+const off = poolRecords.filter(r => r.result === "off").length;
+const maxPity = poolRecords.length
+  ? Math.max(...poolRecords.map(r => Number(r.pity || 0)))
+  : 0;
+
+$("totalPulls").textContent = total.toLocaleString();
+$("fiveCount").textContent = poolRecords.length;
+$("offCountLabel").textContent =
+  selectedStatsPool === "standard" ? "最高出金抽數" : "歪卡次數";
+$("offCount").textContent =
+  selectedStatsPool === "standard" ? (maxPity || "—") : off;
+$("avgPulls").textContent = poolRecords.length
+  ? (total / poolRecords.length).toFixed(1)
+  : "—";
  const sorted=[...records].sort((a,b)=>b.date.localeCompare(a.date));
  $("recent").innerHTML=sorted.length?sorted.slice(0,5).map(r=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(r.item_name)}</b><div class="muted">${esc(r.date)} · ${poolNames[r.pool]}</div></div><span>${r.pity} 抽 · ${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</span></div>`).join(""):'<div class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div>';
  const pools=["character","lightcone","standard"];
