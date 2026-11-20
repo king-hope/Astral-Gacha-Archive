@@ -175,7 +175,14 @@ $("pitySummary").innerHTML=pools.map(p=>{
     return `<div class="row" style="padding:7px 0">
       <span>${poolNames[p]}</span>
       <b>尚未設定</b>
-    </div>`;
+    </div>
+    
+ <div class="panel">
+  <h2>五星結果分布</h2>
+  <div id="statsResultDistribution">
+    <p class="muted">尚無五星紀錄</p>
+  </div>
+</div>`;
   }
 
   const remaining=Math.max(0,limit-state.current_pity);
