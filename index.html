@@ -309,9 +309,48 @@ $("statsPoolTabs").addEventListener("click", e => {
 
   render();
 });
-$("recordForm").addEventListener("submit",async e=>{e.preventDefault();let r={id:crypto.randomUUID(),date:$("date").value,pool:$("pool").value,item_name:$("itemName").value.trim(),pity:Number($("pity").value),result:$("result").value,rank:Number($("rank").value||0),notes:$("notes").value.trim(),created_at:new Date().toISOString()};
- if(user&&client){const {error}=await client.from("gacha_records").insert({...r,user_id:user.id});if(error){alert("雲端儲存失敗："+error.message);return;}}
- records.push(r);saveLocal();e.target.reset();$("date").value=new Date().toISOString().slice(0,10);$("rank").value=0;render();document.querySelector('[data-tab="overview"]').click();});
+
+$("recordForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+
+ let sameDayRecords=records.filter(
+  x=>x.date===$("date").value&&x.pool===$("pool").value
+ );
+
+ let nextSortOrder=sameDayRecords.reduce(
+  (max,x)=>Math.max(max,Number(x.sort_order)||0),0
+ )+1;
+
+ let r={
+  id:crypto.randomUUID(),
+  date:$("date").value,
+  pool:$("pool").value,
+  item_name:$("itemName").value.trim(),
+  pity:Number($("pity").value),
+  result:$("result").value,
+  rank:Number($("rank").value||0),
+  notes:$("notes").value.trim(),
+  sort_order:nextSortOrder,
+  created_at:new Date().toISOString()
+ };
+
+ if(user&&client){
+  const {error}=await client.from("gacha_records").insert({...r,user_id:user.id});
+  if(error){
+   alert("雲端儲存失敗："+error.message);
+   return;
+  }
+ }
+
+ records.push(r);
+ saveLocal();
+ e.target.reset();
+ $("date").value=new Date().toISOString().slice(0,10);
+ $("rank").value=0;
+ render();
+ document.querySelector('[data-tab="overview"]').click();
+});
+
 $("exportBtn").addEventListener("click",()=>download("astral-gacha-backup.json",JSON.stringify(records,null,2),"application/json"));
 $("exportCsvBtn").addEventListener("click",()=>{let cols=["date","pool","item_name","pity","result","rank","notes"];let csv=[cols.join(","),...records.map(r=>cols.map(c=>'"'+String(r[c]??"").replaceAll('"','""')+'"').join(","))].join("\n");download("astral-gacha-records.csv","\ufeff"+csv,"text/csv;charset=utf-8");});
 function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
