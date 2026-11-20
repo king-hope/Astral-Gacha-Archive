@@ -44,7 +44,10 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <div class="grid">
 <div class="stat"><small>累計抽數</small><strong id="totalPulls">0</strong></div>
 <div class="stat"><small>五星取得</small><strong id="fiveCount">0</strong></div>
-<div class="stat"><small id="offCountLabel">歪卡次數</small><strong id="offCount">0</strong></div>
+<div class="stat" id="offCountStat">
+  <small id="offCountLabel">歪卡次數</small>
+  <strong id="offCount">0</strong>
+</div>
 <div class="stat"><small>平均出金抽數</small><strong id="avgPulls">—</strong></div>
 <div class="stat">
   <small>最低出金抽數</small>
@@ -143,9 +146,9 @@ const upCount = poolRecords.filter(r => r.result === "up").length;
 const decidedCount = upCount + off;
 
 if (selectedStatsPool === "standard") {
-  $("offCountLabel").textContent = "最高出金抽數";
-  $("offCount").textContent = maxPity || "—";
+  $("offCountStat").style.display = "none";
 } else {
+  $("offCountStat").style.display = "";
   $("offCountLabel").textContent = "UP 命中率";
   $("offCount").textContent = decidedCount
     ? `${(upCount / decidedCount * 100).toFixed(1)}%`
