@@ -163,6 +163,50 @@ let gameAssets = {
   characters: {},
   lightCones: {}
 };
+
+async function loadGameAssets(){
+  const baseURL="https://vizualabstract.github.io/StarRailStaticAPI";
+  const assetURL=baseURL+"/assets/";
+
+  try{
+    const [characterResponse,lightConeResponse]=await Promise.all([
+      fetch(baseURL+"/db/cht/characters.json"),
+      fetch(baseURL+"/db/cht/light_cones.json")
+    ]);
+
+    if(!characterResponse.ok||!lightConeResponse.ok){
+      throw new Error("遊戲素材資料讀取失敗");
+    }
+
+    const [characterData,lightConeData]=await Promise.all([
+      characterResponse.json(),
+      lightConeResponse.json()
+    ]);
+
+    gameAssets.characters=Object.fromEntries(
+      Object.values(characterData)
+        .filter(item=>item.name&&item.icon)
+        .map(item=>[
+          item.name.trim().toLowerCase(),
+          assetURL+item.icon
+        ])
+    );
+
+    gameAssets.lightCones=Object.fromEntries(
+      Object.values(lightConeData)
+        .filter(item=>item.name&&item.icon)
+        .map(item=>[
+          item.name.trim().toLowerCase(),
+          assetURL+item.icon
+        ])
+    );
+
+    console.log("角色與光錐素材載入完成");
+  }catch(error){
+    console.warn("遊戲素材載入失敗：",error);
+  }
+}
+
 let poolStates = {};
 let selectedStatsPool = "character";
 let user = null;
@@ -671,22 +715,26 @@ $("poolStateForm").addEventListener("submit", async e => {
 
   alert("保底狀態已成功儲存至雲端！");
 });
-async function init(){if(!supabaseReady){$("authStatus").textContent="本機預覽";return;}
- const {data:{session}}=await client.auth.getSession();user=session?.user||null;updateAuth();
- client.auth.onAuthStateChange(async(_event,session)=>{user=session?.user||null;updateAuth();if(user)await loadCloud();});
- if(user)await loadCloud();
-}
-function updateAuth(){$("authStatus").textContent=user?"已登入雲端":"尚未登入";$("welcome").textContent=user?`已登入：${user.email||"Google 帳號"}`:"你的躍遷歷程，從這裡開始。";$("loginBtn").textContent=user?"已使用 Google 登入":"使用 Google 登入";$("loginBtn").disabled=!!user;$("logoutBtn").disabled=!user;$("setupNotice").classList.toggle("hidden",!!user);$("cloudInfo").textContent=user?"已連接 Supabase，資料會同步至雲端。":"尚未登入雲端帳號。";}
-async function loadCloud(){
-  const {data,error}=await client
-    .from("gacha_records")
-    .select("*")
-    .order("date",{ascending:false});
+async function init(){
+  loadGameAssets();
 
-  if(error){
-    $("cloudInfo").textContent="讀取雲端資料失敗："+error.message;
+  if(!supabaseReady){
+    $("authStatus").textContent="本機預覽";
     return;
   }
+
+  const {data:{session}}=await client.auth.getSession();
+  user=session?.user||null;
+  updateAuth();
+
+  client.auth.onAuthStateChange(async(_event,session)=>{
+    user=session?.user||null;
+    updateAuth();
+    if(user)await loadCloud();
+  });
+
+  if(user)await loadCloud();
+}
 
   records=data||[];
   saveLocal();
