@@ -774,7 +774,7 @@ async function init(){
   });
 
   render();
-}
+
 $("loginBtn").addEventListener("click",async()=>{if(!client){alert("請先依 README 設定 Supabase URL 與 anon key。");return;}const {error}=await client.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.href}});if(error)alert(error.message);});
 $("logoutBtn").addEventListener("click",async()=>{if(client&&user)await client.auth.signOut();user=null;updateAuth();});
 render();init();
