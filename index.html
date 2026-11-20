@@ -222,7 +222,7 @@ $("statsResultDistribution").innerHTML = resultTotal
  const sorted=[...records].sort((a,b)=>{
   const dateCompare=b.date.localeCompare(a.date);
   if(dateCompare!==0) return dateCompare;
-  return (a.sort_order??0)-(b.sort_order??0);
+  return (b.sort_order??0)-(a.sort_order??0);
 });
  $("recent").innerHTML=sorted.length?sorted.slice(0,5).map(r=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(r.item_name)}</b><div class="muted">${esc(r.date)} · ${poolNames[r.pool]}</div></div><span>${r.pity} 抽 · ${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</span></div>`).join(""):'<div class="empty">尚無紀錄。新增第一筆五星紀錄吧。</div>';
  const pools=["character","lightcone","standard"];
