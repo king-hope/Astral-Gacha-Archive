@@ -108,6 +108,7 @@ const supabaseReady = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
 const client = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let records = JSON.parse(localStorage.getItem("aga_records") || "[]");
 let poolStates = {};
+let selectedStatsPool = "character";
 let user = null;
 const poolNames={
   character:"角色活動躍遷",
@@ -196,6 +197,18 @@ $("recordTable").addEventListener("click",e=>{
 });
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["overview","records","add","settings"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));}));
 $("poolFilter").addEventListener("change",renderTable);
+$("statsPoolTabs").addEventListener("click", e => {
+  const button = e.target.closest("button[data-stats-pool]");
+  if (!button) return;
+
+  selectedStatsPool = button.dataset.statsPool;
+
+  document.querySelectorAll("#statsPoolTabs button").forEach(btn => {
+    btn.classList.toggle("active", btn === button);
+  });
+
+  render();
+});
 $("recordForm").addEventListener("submit",async e=>{e.preventDefault();let r={id:crypto.randomUUID(),date:$("date").value,pool:$("pool").value,item_name:$("itemName").value.trim(),pity:Number($("pity").value),result:$("result").value,rank:Number($("rank").value||0),notes:$("notes").value.trim(),created_at:new Date().toISOString()};
  if(user&&client){const {error}=await client.from("gacha_records").insert({...r,user_id:user.id});if(error){alert("雲端儲存失敗："+error.message);return;}}
  records.push(r);saveLocal();e.target.reset();$("date").value=new Date().toISOString().slice(0,10);$("rank").value=0;render();document.querySelector('[data-tab="overview"]').click();});
