@@ -446,6 +446,15 @@ $("recordTable").addEventListener("click",e=>{
 });
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["overview","records","add","settings"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));}));
 $("poolFilter").addEventListener("change",renderTable);
+$("showTableBtn").addEventListener("click",()=>{
+  $("recordTable").classList.remove("hidden");
+  $("recordChart").classList.add("hidden");
+});
+
+$("showChartBtn").addEventListener("click",()=>{
+  $("recordTable").classList.add("hidden");
+  $("recordChart").classList.remove("hidden");
+});
 $("statsPoolTabs").addEventListener("click", e => {
   const button = e.target.closest("button[data-stats-pool]");
   if (!button) return;
