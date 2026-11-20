@@ -715,6 +715,38 @@ $("poolStateForm").addEventListener("submit", async e => {
 
   alert("保底狀態已成功儲存至雲端！");
 });
+
+async function loadCloud(){
+  const {data,error}=await client
+    .from("gacha_records")
+    .select("*")
+    .order("date",{ascending:false});
+
+  if(error){
+    $("cloudInfo").textContent="讀取雲端資料失敗："+error.message;
+    return;
+  }
+
+  records=data||[];
+  saveLocal();
+
+  const {data:states,error:stateError}=await client
+    .from("gacha_pool_states")
+    .select("*");
+
+  if(stateError){
+    $("cloudInfo").textContent="讀取保底狀態失敗："+stateError.message;
+    return;
+  }
+
+  poolStates={};
+  (states||[]).forEach(state=>{
+    poolStates[state.pool]=state;
+  });
+
+  render();
+}
+
 async function init(){
   loadGameAssets();
 
