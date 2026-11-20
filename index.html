@@ -278,19 +278,93 @@ $("pitySummary").innerHTML=pools.map(p=>{
  renderTable();
 }
 
+
 function renderTable(){
- let f=$("poolFilter").value;
+  let f=$("poolFilter").value;
 
- let list=[...records]
-  .filter(r=>f==="all"||r.pool===f)
-  .sort((a,b)=>{
-   const dateCompare=b.date.localeCompare(a.date);
-   if(dateCompare!==0) return dateCompare;
+  let list=[...records]
+    .filter(r=>f==="all"||r.pool===f)
+    .sort((a,b)=>{
+      const dateCompare=b.date.localeCompare(a.date);
+      if(dateCompare!==0) return dateCompare;
 
-   return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
-  });
+      return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
+    });
 
- $("recordTable").innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>日期</th><th>卡池</th><th>名稱</th><th>抽數</th><th>結果</th><th>星魂／疊影</th><th>操作</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.date)}</td><td>${poolNames[r.pool]}</td><td>${esc(r.item_name)}</td><td>${r.pity}</td><td>${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</td><td>${r.rank??0}</td><td style="white-space:nowrap"><button type="button" data-edit="${esc(r.id)}">編輯</button> <button type="button" class="danger" data-delete="${esc(r.id)}">刪除</button></td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">目前沒有符合條件的資料。</div>';
+  $("recordTable").innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>日期</th><th>卡池</th><th>名稱</th><th>抽數</th><th>結果</th><th>星魂／疊影</th><th>操作</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.date)}</td><td>${poolNames[r.pool]}</td><td>${esc(r.item_name)}</td><td>${r.pity}</td><td>${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</td><td>${r.rank??0}</td><td style="white-space:nowrap"><button type="button" data-edit="${esc(r.id)}">編輯</button> <button type="button" class="danger" data-delete="${esc(r.id)}">刪除</button></td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">目前沒有符合條件的資料。</div>';
+
+  renderChart();
+}
+
+function renderChart(){
+  let f=$("poolFilter").value;
+
+  let list=[...records]
+    .filter(r=>f==="all"||r.pool===f)
+    .sort((a,b)=>{
+      const dateCompare=b.date.localeCompare(a.date);
+      if(dateCompare!==0) return dateCompare;
+
+      return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
+    });
+
+  if(!list.length){
+    $("recordChart").innerHTML='<div class="empty">目前沒有符合條件的資料。</div>';
+    return;
+  }
+
+  const colors={
+    up:"#D8B96E",
+    off:"#D97878",
+    standard:"#8996D4"
+  };
+
+  const labels={
+    up:"UP",
+    off:"歪卡",
+    standard:"常駐"
+  };
+
+  $("recordChart").innerHTML=`
+    <div style="margin:16px 0 20px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;">
+        <span>0 抽</span>
+        <span>30 抽</span>
+        <span>60 抽</span>
+        <span>90 抽</span>
+      </div>
+
+      ${list.map(r=>{
+        const pity=Math.max(0,Math.min(90,Number(r.pity)||0));
+        const color=colors[r.result]||colors.standard;
+        const label=labels[r.result]||"常駐";
+
+        return `
+          <div style="padding:12px 0;border-bottom:1px solid var(--line);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+              <div style="min-width:0;">
+                <strong>${esc(r.item_name)}</strong>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px;">
+                  ${esc(r.date)} ・ ${poolNames[r.pool]||""}
+                </div>
+              </div>
+
+              <div style="text-align:right;white-space:nowrap;">
+                <strong>${pity} 抽</strong>
+                <div style="font-size:12px;color:${color};margin-top:4px;">
+                  ${label}
+                </div>
+              </div>
+            </div>
+
+            <div style="height:14px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:10px;">
+              <div style="height:100%;width:${pity/90*100}%;background:${color};border-radius:99px;"></div>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
 }
 
 
