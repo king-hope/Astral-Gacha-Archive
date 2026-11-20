@@ -519,7 +519,10 @@ $("recordTable").addEventListener("click",e=>{
  if(del)deleteRecord(del.dataset.delete);
 });
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["overview","records","add","settings"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));}));
-$("poolFilter").addEventListener("change",renderTable);
+$("poolFilter").addEventListener("change",()=>{
+  renderTable();
+  renderChart();
+});
 $("showTableBtn").addEventListener("click",()=>{
   $("recordTable").classList.remove("hidden");
   $("recordChart").classList.add("hidden");
