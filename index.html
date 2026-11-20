@@ -272,26 +272,143 @@ function renderTable(){
  $("recordTable").innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>日期</th><th>卡池</th><th>名稱</th><th>抽數</th><th>結果</th><th>星魂／疊影</th><th>操作</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.date)}</td><td>${poolNames[r.pool]}</td><td>${esc(r.item_name)}</td><td>${r.pity}</td><td>${r.result==="off"?"歪卡":r.result==="up"?"UP":"常駐"}</td><td>${r.rank??0}</td><td style="white-space:nowrap"><button type="button" data-edit="${esc(r.id)}">編輯</button> <button type="button" class="danger" data-delete="${esc(r.id)}">刪除</button></td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">目前沒有符合條件的資料。</div>';
 }
 
+
 async function editRecord(id){
- const r=records.find(x=>String(x.id)===String(id)); if(!r)return;
- const date=prompt("取得日期（YYYY-MM-DD）",r.date); if(date===null)return;
- const pool=prompt("卡池：character／lightcone／standard",r.pool); if(pool===null)return;
- if(!poolNames[pool]){alert("卡池代碼不正確，請使用 character、lightcone 或 standard");return;}
- const item_name=prompt("角色／光錐名稱",r.item_name); if(item_name===null)return;
- const pityText=prompt("本次出金前累積抽數（1–90）",String(r.pity)); if(pityText===null)return;
- const pity=Number(pityText); if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!item_name.trim()||!Number.isInteger(pity)||pity<1||pity>90){alert("資料格式不正確，請確認日期、名稱及抽數。");return;}
- const result=prompt("結果：up／off／standard",r.result); if(result===null)return;
- if(!["up","off","standard"].includes(result)){alert("結果代碼不正確，請使用 up、off 或 standard。");return;}
- const rankText=prompt("星魂／疊影（0–6）",String(r.rank??0)); if(rankText===null)return;
- const rank=Number(rankText); if(!Number.isInteger(rank)||rank<0||rank>6){alert("星魂／疊影請填 0–6 的整數。");return;}
- const notes=prompt("備註（可留空）",r.notes||""); if(notes===null)return;
- const changes={date,pool,item_name:item_name.trim(),pity,result,rank,notes:notes.trim()};
- if(user&&client){
-  const {error}=await client.from("gacha_records").update(changes).eq("id",id);
-  if(error){alert("雲端更新失敗："+error.message);return;}
+ const r=records.find(x=>String(x.id)===String(id));
+ if(!r)return;
+
+ const oldDate=r.date;
+ const oldPool=r.pool;
+
+ const date=prompt("取得日期（YYYY-MM-DD）",r.date);
+ if(date===null)return;
+
+ const pool=prompt("卡池：character／lightcone／standard",r.pool);
+ if(pool===null)return;
+
+ if(!poolNames[pool]){
+  alert("卡池代碼不正確，請使用 character、lightcone 或 standard");
+  return;
  }
- Object.assign(r,changes); saveLocal(); render(); alert("紀錄已更新。");
+
+ const sameGroup=oldDate===date&&oldPool===pool;
+
+ const targetOthers=records
+  .filter(x=>x!==r&&x.date===date&&x.pool===pool)
+  .sort((a,b)=>(Number(a.sort_order)||0)-(Number(b.sort_order)||0));
+
+ const defaultOrder=sameGroup
+  ?Number(r.sort_order)||1
+  :targetOthers.reduce((max,x)=>Math.max(max,Number(x.sort_order)||0),0)+1;
+
+ const orderText=prompt(
+  "同日抽取順序（1代表最早抽到，數字越大代表越晚）",
+  String(defaultOrder)
+ );
+ if(orderText===null)return;
+
+ const sort_order=Number(orderText);
+
+ if(!Number.isInteger(sort_order)||sort_order<1||sort_order>targetOthers.length+1){
+  alert("抽取順序必須是 1 到 "+(targetOthers.length+1)+" 的整數。");
+  return;
+ }
+
+ const item_name=prompt("角色／光錐名稱",r.item_name);
+ if(item_name===null)return;
+
+ const pityText=prompt("本次出金前累積抽數（1–90）",String(r.pity));
+ if(pityText===null)return;
+
+ const pity=Number(pityText);
+
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!item_name.trim()||!Number.isInteger(pity)||pity<1||pity>90){
+  alert("資料格式不正確，請確認日期、名稱及抽數。");
+  return;
+ }
+
+ const result=prompt("結果：up／off／standard",r.result);
+ if(result===null)return;
+
+ if(!["up","off","standard"].includes(result)){
+  alert("結果代碼不正確，請使用 up、off 或 standard。");
+  return;
+ }
+
+ const rankText=prompt("星魂／疊影（0–6）",String(r.rank??0));
+ if(rankText===null)return;
+
+ const rank=Number(rankText);
+
+ if(!Number.isInteger(rank)||rank<0||rank>6){
+  alert("星魂／疊影請填 0–6 的整數。");
+  return;
+ }
+
+ const notes=prompt("備註（可留空）",r.notes||"");
+ if(notes===null)return;
+
+ const changes={
+  date,
+  pool,
+  item_name:item_name.trim(),
+  pity,
+  result,
+  rank,
+  notes:notes.trim()
+ };
+
+ const oldGroup=records
+  .filter(x=>x!==r&&x.date===oldDate&&x.pool===oldPool)
+  .sort((a,b)=>(Number(a.sort_order)||0)-(Number(b.sort_order)||0));
+
+ const targetGroup=[...targetOthers];
+ targetGroup.splice(sort_order-1,0,r);
+
+ const updates=[];
+
+ if(!sameGroup){
+  oldGroup.forEach((record,index)=>{
+   updates.push({
+    record,
+    changes:{sort_order:index+1}
+   });
+  });
+ }
+
+ targetGroup.forEach((record,index)=>{
+  const update={sort_order:index+1};
+
+  if(record===r){
+   Object.assign(update,changes);
+  }
+
+  updates.push({record,changes:update});
+ });
+
+ if(user&&client){
+  for(const item of updates){
+   const {error}=await client
+    .from("gacha_records")
+    .update(item.changes)
+    .eq("id",item.record.id);
+
+   if(error){
+    alert("雲端更新失敗："+error.message+"。請重新整理資料後確認排序。");
+    return;
+   }
+  }
+ }
+
+ updates.forEach(item=>{
+  Object.assign(item.record,item.changes);
+ });
+
+ saveLocal();
+ render();
+ alert("紀錄已更新。");
 }
+
 async function deleteRecord(id){
  const r=records.find(x=>String(x.id)===String(id)); if(!r)return;
  if(!confirm(`確定刪除「${r.item_name}」這筆五星紀錄嗎？此操作無法復原。`))return;
