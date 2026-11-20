@@ -207,7 +207,7 @@ $("statsResultDistribution").innerHTML = resultTotal
           </div>
 
           <div style="height:9px; background:var(--border); border-radius:99px; overflow:hidden; margin-top:8px;">
-            <div style="height:100%; width:${percent}%; background:#D8B96E; border-radius:99px;"></div>
+            <div style="height:100%; width:${percent}%; background:${item.key === "up" ? "#D8B96E" : item.key === "off" ? "#D97878" : "#8996D4"}; border-radius:99px;"></div>
           </div>
 
           <div style="display:flex; justify-content:space-between; padding:0 1px; margin-top:3px;">
