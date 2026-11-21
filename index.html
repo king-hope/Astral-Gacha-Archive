@@ -920,7 +920,35 @@ $("exportCsvBtn").addEventListener("click",()=>{
     "\ufeff"+csv,
     "text/csv;charset=utf-8"
   );
-});function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
+});
+
+$("exportPoolStatesBtn").addEventListener("click",()=>{
+  const cols=[
+    "pool",
+    "current_pity",
+    "guaranteed",
+    "updated_at"
+  ];
+
+  const csv=[
+    cols.join(","),
+    ...Object.entries(poolStates).map(([pool,state])=>
+      cols.map(c=>
+        '"'+String(
+          c==="pool" ? pool : state[c]??""
+        ).replaceAll('"','""')+'"'
+      ).join(",")
+    )
+  ].join("\n");
+
+  download(
+    "astral-gacha-pool-states.csv",
+    "\ufeff"+csv,
+    "text/csv;charset=utf-8"
+  );
+});  
+  
+function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
 const pityLimits = {
   character: 89,
   lightcone: 79,
