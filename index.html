@@ -592,6 +592,14 @@ async function editRecord(id){
  const pool=prompt("卡池：character／lightcone／standard",r.pool);
  if(pool===null)return;
 
+ const versionText=prompt(
+ "所屬版本（例如 4.7）",
+ r.game_version||getVersionByDate(date)||""
+  );
+  if(versionText===null)return;
+
+ const game_version=versionText.trim();
+  
  if(!poolNames[pool]){
   alert("卡池代碼不正確，請使用 character、lightcone 或 standard");
   return;
@@ -657,6 +665,7 @@ async function editRecord(id){
  const changes={
   date,
   pool,
+  game_version,
   item_name:item_name.trim(),
   pity,
   result,
