@@ -898,6 +898,11 @@ $("exportBtn").addEventListener("click",()=>{
     "application/json"
   );
 });
+
+$("importBtn").addEventListener("click",()=>{
+  $("importFile").click();
+});
+  
 $("exportCsvBtn").addEventListener("click",()=>{
   const cols=[
     "date",
