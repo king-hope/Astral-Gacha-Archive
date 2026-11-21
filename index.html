@@ -222,7 +222,21 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 const SUPABASE_URL = "https://vpsicgfmzlgpmjxwaaop.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_zqIpVlyQQAEBD3dITGviQA_EzeFKLap";
 const supabaseReady = !!(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase);
-const client = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+const client = supabaseReady
+  ? window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY,
+      {
+        auth: {
+          flowType: "pkce",
+          detectSessionInUrl: true,
+          persistSession: true,
+          autoRefreshToken: true
+        }
+      }
+    )
+  : null;
 let records = JSON.parse(localStorage.getItem("aga_records") || "[]");
 let gameAssets = {
   characters: {},
