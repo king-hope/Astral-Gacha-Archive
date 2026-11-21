@@ -321,6 +321,34 @@ function renderVersionStats(){
                 <small>UP／歪卡</small>
                 <strong>${up}／${off}</strong>
               </div>
+                        </div>
+
+            <div style="margin-top:20px;">
+              <h4>五星取得紀錄</h4>
+
+              ${[...list]
+                .sort((a,b)=>{
+                  const dateCompare=b.date.localeCompare(a.date);
+                  if(dateCompare!==0) return dateCompare;
+                  return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
+                })
+                .map(r=>`
+                  <div class="row" style="padding:10px 0;border-bottom:1px solid var(--line);">
+                    <div>
+                      <strong>${esc(r.item_name)}</strong>
+                      <div class="muted">
+                        ${esc(r.date)} · ${r.pool==="character"?"角色活動躍遷":"光錐活動躍遷"}
+                      </div>
+                    </div>
+
+                    <div style="text-align:right;white-space:nowrap;">
+                      <strong>${r.pity} 抽</strong>
+                      <div class="muted" style="color:${r.result==="up"?"#D8B96E":"#D97878"};">
+                        ${r.result==="up"?"UP":"歪卡"}
+                      </div>
+                    </div>
+                  </div>
+                `).join("")}
             </div>
           </div>
         `;
