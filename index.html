@@ -705,6 +705,7 @@ $("recordForm").addEventListener("submit",async e=>{
   rank:Number($("rank").value||0),
   notes:$("notes").value.trim(),
   sort_order:nextSortOrder,
+  game_version:getVersionByDate($("date").value),
   created_at:new Date().toISOString()
  };
 
