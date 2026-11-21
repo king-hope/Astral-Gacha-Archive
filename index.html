@@ -257,10 +257,13 @@ $("date").value=new Date().toISOString().slice(0,10);
 function saveLocal(){localStorage.setItem("aga_records",JSON.stringify(records));}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function renderVersionStats(){
-  const versionRecords=records.filter(r=>
-    ["character","lightcone"].includes(r.pool) &&
-    r.game_version
-  );
+  const selectedPool=$("versionPoolFilter").value;
+
+const versionRecords=records.filter(r=>
+  ["character","lightcone"].includes(r.pool) &&
+  r.game_version &&
+  (selectedPool==="all" || r.pool===selectedPool)
+);
 
   const versions=[...new Set(
     versionRecords.map(r=>r.game_version)
