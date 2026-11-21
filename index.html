@@ -206,7 +206,10 @@ async function loadGameAssets(){
   }
 }
 function getGameIcon(name){
-  const key=String(name||"").trim().toLowerCase();
+  const key=String(name||"")
+    .trim()
+    .toLowerCase()
+    .replace(/[．·・]/g,"•");
 
   return gameAssets.characters[key]
     || gameAssets.lightCones[key]
