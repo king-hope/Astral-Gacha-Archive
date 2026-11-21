@@ -768,7 +768,26 @@ async function init(){
 
   if(user)await loadCloud();
 }
+function updateAuth(){
+  $("authStatus").textContent=user?"已登入雲端":"尚未登入";
 
+  $("welcome").textContent=user
+    ?`已登入：${user.email||"Google 帳號"}`
+    :"你的躍遷歷程，從這裡開始。";
+
+  $("loginBtn").textContent=user
+    ?"已使用 Google 登入"
+    :"使用 Google 登入";
+
+  $("loginBtn").disabled=!!user;
+  $("logoutBtn").disabled=!user;
+
+  $("setupNotice").classList.toggle("hidden",!!user);
+
+  $("cloudInfo").textContent=user
+    ?"已連接 Supabase，資料會同步至雲端。"
+    :"尚未登入雲端帳號。";
+}
 $("loginBtn").addEventListener("click",async()=>{if(!client){alert("請先依 README 設定 Supabase URL 與 anon key。");return;}const {error}=await client.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.href}});if(error)alert(error.message);});
 $("logoutBtn").addEventListener("click",async()=>{if(client&&user)await client.auth.signOut();user=null;updateAuth();});
 render();init();
