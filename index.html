@@ -579,17 +579,9 @@ function renderTable(){
 }
 
 
+
 function renderChart(){
-  let f=$("poolFilter").value;
-
-  let list=[...records]
-    .filter(r=>f==="all"||r.pool===f)
-    .sort((a,b)=>{
-      const dateCompare=b.date.localeCompare(a.date);
-      if(dateCompare!==0) return dateCompare;
-
-      return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
-    });
+  const list=getFilteredRecords();
 
   if(!list.length){
     $("recordChart").innerHTML='<div class="empty">目前沒有符合條件的資料。</div>';
@@ -627,16 +619,16 @@ function renderChart(){
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
               <div style="min-width:0;">
                 <div style="display:flex;align-items:center;gap:8px;">
-  ${getGameIcon(r.item_name)?`
-    <img
-      src="${esc(getGameIcon(r.item_name))}"
-      alt=""
-      style="width:40px;height:40px;object-fit:contain;border-radius:6px;flex-shrink:0;"
-      onerror="this.style.display='none'"
-    >
-  `:""}
-  <strong>${esc(r.item_name)}</strong>
-</div>
+                  ${getGameIcon(r.item_name)?`
+                    <img
+                      src="${esc(getGameIcon(r.item_name))}"
+                      alt=""
+                      style="width:40px;height:40px;object-fit:contain;border-radius:6px;flex-shrink:0;"
+                      onerror="this.style.display='none'"
+                    >
+                  `:""}
+                  <strong>${esc(r.item_name)}</strong>
+                </div>
                 <div style="font-size:12px;color:var(--muted);margin-top:4px;">
                   ${esc(r.date)} ・ ${poolNames[r.pool]||""}
                 </div>
@@ -651,11 +643,10 @@ function renderChart(){
             </div>
 
             <div style="height:14px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:10px;position:relative;">
-  <div style="height:100%;width:${pity/90*100}%;background:${color};border-radius:99px;"></div>
+              <div style="height:100%;width:${pity/90*100}%;background:${color};border-radius:99px;"></div>
 
-  <div style="position:absolute;left:33.333%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45);"></div>
-  <div style="position:absolute;left:66.666%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45);"></div>
-</div>
+              <div style="position:absolute;left:33.333%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45);"></div>
+              <div style="position:absolute;left:66.666%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45);"></div>
             </div>
           </div>
         `;
@@ -663,6 +654,7 @@ function renderChart(){
     </div>
   `;
 }
+
 
 
 async function editRecord(id){
