@@ -821,6 +821,26 @@ $("poolFilter").addEventListener("change",()=>{
   renderTable();
   renderChart();
 });
+// 搜尋名稱時即時更新
+$("recordSearch").addEventListener("input",()=>{
+  renderTable();
+});
+
+// 切換結果類型
+$("resultFilter").addEventListener("change",()=>{
+  renderTable();
+});
+
+// 修改開始日期
+$("recordStartDate").addEventListener("change",()=>{
+  renderTable();
+});
+
+// 修改結束日期
+$("recordEndDate").addEventListener("change",()=>{
+  renderTable();
+});
+  
 $("versionPoolFilter").addEventListener("change",()=>{
   renderVersionStats();
 });  
