@@ -206,7 +206,14 @@ async function loadGameAssets(){
     console.warn("遊戲素材載入失敗：",error);
   }
 }
+function getGameIcon(name){
+  const key=String(name||"").trim().toLowerCase();
 
+  return gameAssets.characters[key]
+    || gameAssets.lightCones[key]
+    || "";
+}
+  
 let poolStates = {};
 let selectedStatsPool = "character";
 let user = null;
