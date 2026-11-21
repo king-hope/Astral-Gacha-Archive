@@ -759,6 +759,9 @@ $("poolFilter").addEventListener("change",()=>{
   renderTable();
   renderChart();
 });
+$("versionPoolFilter").addEventListener("change",()=>{
+  renderVersionStats();
+});  
 $("showTableBtn").addEventListener("click",()=>{
   $("recordTable").classList.remove("hidden");
   $("recordChart").classList.add("hidden");
