@@ -769,41 +769,6 @@ async function init(){
   if(user)await loadCloud();
 }
 
-async function init(){
-  loadGameAssets();
-
-  if(!supabaseReady){
-    $("authStatus").textContent="本機預覽";
-    return;
-  }
-
-  const {data:{session}}=await client.auth.getSession();
-  user=session?.user||null;
-  updateAuth();
-
-  client.auth.onAuthStateChange(async(_event,session)=>{
-    user=session?.user||null;
-    updateAuth();
-    if(user)await loadCloud();
-  });
-
-  if(user)await loadCloud();
-}
-  const {data:states,error:stateError}=await client
-    .from("gacha_pool_states")
-    .select("*");
-
-  if(stateError){
-    $("cloudInfo").textContent="讀取保底狀態失敗："+stateError.message;
-    return;
-  }
-  poolStates={};
-  (states||[]).forEach(state=>{
-    poolStates[state.pool]=state;
-  });
-
-  render();
-
 $("loginBtn").addEventListener("click",async()=>{if(!client){alert("請先依 README 設定 Supabase URL 與 anon key。");return;}const {error}=await client.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.href}});if(error)alert(error.message);});
 $("logoutBtn").addEventListener("click",async()=>{if(client&&user)await client.auth.signOut();user=null;updateAuth();});
 render();init();
