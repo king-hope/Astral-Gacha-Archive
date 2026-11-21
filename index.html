@@ -409,7 +409,17 @@ function renderChart(){
           <div style="padding:12px 0;border-bottom:1px solid var(--line);">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
               <div style="min-width:0;">
-                <strong>${esc(r.item_name)}</strong>
+                <div style="display:flex;align-items:center;gap:8px;">
+  ${getGameIcon(r.item_name)?`
+    <img
+      src="${esc(getGameIcon(r.item_name))}"
+      alt=""
+      style="width:40px;height:40px;object-fit:contain;border-radius:6px;flex-shrink:0;"
+      onerror="this.style.display='none'"
+    >
+  `:""}
+  <strong>${esc(r.item_name)}</strong>
+</div>
                 <div style="font-size:12px;color:var(--muted);margin-top:4px;">
                   ${esc(r.date)} ・ ${poolNames[r.pool]||""}
                 </div>
