@@ -138,6 +138,37 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
       </select>
     </div>
 
+<details style="margin:12px 0;">
+  <summary style="cursor:pointer;padding:10px 0;">
+    搜尋與篩選
+  </summary>
+
+  <div style="display:grid;gap:10px;margin-top:12px;">
+    <input
+      id="recordSearch"
+      type="text"
+      placeholder="搜尋角色或光錐名稱"
+    >
+
+    <select id="resultFilter">
+      <option value="all">全部結果</option>
+      <option value="up">UP</option>
+      <option value="off">歪卡</option>
+      <option value="standard">常駐</option>
+    </select>
+
+    <div>
+      <label for="recordStartDate">開始日期</label>
+      <input id="recordStartDate" type="date">
+    </div>
+
+    <div>
+      <label for="recordEndDate">結束日期</label>
+      <input id="recordEndDate" type="date">
+    </div>
+  </div>
+</details>
+    
     <div class="row" style="margin:12px 0;">
   <button type="button" id="showChartBtn">抽卡圖表</button>
   <button type="button" id="showTableBtn">表格</button>
