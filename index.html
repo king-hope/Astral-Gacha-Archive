@@ -902,6 +902,70 @@ $("exportBtn").addEventListener("click",()=>{
 $("importBtn").addEventListener("click",()=>{
   $("importFile").click();
 });
+
+$("importFile").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const backup = JSON.parse(text);
+
+    if (
+      backup.format !== "astral-gacha-backup" ||
+      backup.version !== 1 ||
+      !Array.isArray(backup.records) ||
+      !backup.poolStates ||
+      typeof backup.poolStates !== "object" ||
+      Array.isArray(backup.poolStates)
+    ) {
+      throw new Error("備份格式不正確，請選擇 Astral Gacha Archive 匯出的 JSON 備份。");
+    }
+
+    const validPools = ["character", "lightcone", "standard"];
+
+    for (const r of backup.records) {
+      if (
+        !r ||
+        typeof r.id !== "string" ||
+        !r.id ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(r.date) ||
+        !validPools.includes(r.pool) ||
+        !String(r.item_name || "").trim() ||
+        !Number.isInteger(Number(r.pity)) ||
+        Number(r.pity) < 1 ||
+        !["up", "off", "standard"].includes(r.result)
+      ) {
+        throw new Error("備份中包含格式不正確的抽卡紀錄。");
+      }
+    }
+
+    for (const [pool, state] of Object.entries(backup.poolStates)) {
+      if (
+        !["character", "lightcone", "standard"].includes(pool) ||
+        !state ||
+        !Number.isInteger(Number(state.current_pity)) ||
+        Number(state.current_pity) < 0 ||
+        Number(state.current_pity) > pityLimits[pool] ||
+        typeof state.guaranteed !== "boolean"
+      ) {
+        throw new Error("備份中包含格式不正確的保底狀態。");
+      }
+    }
+
+    alert(
+      "備份檔案檢查成功！\n\n" +
+      "抽卡紀錄：" + backup.records.length + " 筆\n" +
+      "保底狀態：" + Object.keys(backup.poolStates).length + " 個卡池\n\n" +
+      "目前尚未匯入任何資料。"
+    );
+
+  } catch (error) {
+    alert("匯入檢查失敗：" + error.message);
+  }
+
+  e.target.value = "";
+});
   
 $("exportCsvBtn").addEventListener("click",()=>{
   const cols=[
