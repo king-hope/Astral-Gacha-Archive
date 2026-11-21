@@ -247,6 +247,86 @@ const $=id=>document.getElementById(id);
 $("date").value=new Date().toISOString().slice(0,10);
 function saveLocal(){localStorage.setItem("aga_records",JSON.stringify(records));}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function renderVersionStats(){
+  const versionRecords=records.filter(r=>
+    ["character","lightcone"].includes(r.pool) &&
+    r.game_version
+  );
+
+  const versions=[...new Set(
+    versionRecords.map(r=>r.game_version)
+  )].sort((a,b)=>{
+    const [aMajor,aMinor]=a.split(".").map(Number);
+    const [bMajor,bMinor]=b.split(".").map(Number);
+
+    return bMajor-aMajor || bMinor-aMinor;
+  });
+
+  $("versionList").innerHTML=versions.length
+    ? versions.map(version=>{
+        const list=versionRecords.filter(
+          r=>r.game_version===version
+        );
+
+        const character=list.filter(
+          r=>r.pool==="character"
+        );
+
+        const lightcone=list.filter(
+          r=>r.pool==="lightcone"
+        );
+
+        const totalPulls=list.reduce(
+          (sum,r)=>sum+Number(r.pity||0),0
+        );
+
+        const up=list.filter(r=>r.result==="up").length;
+        const off=list.filter(r=>r.result==="off").length;
+
+        const average=list.length
+          ? (totalPulls/list.length).toFixed(1)
+          : "—";
+
+        return `
+          <div class="panel" style="margin-top:14px;">
+            <h3>Version ${version}</h3>
+
+            <div class="grid">
+              <div class="stat">
+                <small>累計抽數</small>
+                <strong>${totalPulls.toLocaleString()}</strong>
+              </div>
+
+              <div class="stat">
+                <small>五星取得</small>
+                <strong>${list.length}</strong>
+              </div>
+
+              <div class="stat">
+                <small>角色池抽數</small>
+                <strong>${character.reduce((s,r)=>s+Number(r.pity||0),0).toLocaleString()}</strong>
+              </div>
+
+              <div class="stat">
+                <small>光錐池抽數</small>
+                <strong>${lightcone.reduce((s,r)=>s+Number(r.pity||0),0).toLocaleString()}</strong>
+              </div>
+
+              <div class="stat">
+                <small>平均出金抽數</small>
+                <strong>${average}</strong>
+              </div>
+
+              <div class="stat">
+                <small>UP／歪卡</small>
+                <strong>${up}／${off}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("")
+    : '<div class="empty">目前沒有版本紀錄。</div>';
+}
 function render(){
  const poolRecords = records.filter(r => r.pool === selectedStatsPool);
 
