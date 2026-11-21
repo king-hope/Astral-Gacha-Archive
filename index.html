@@ -165,13 +165,12 @@ let gameAssets = {
 };
 
 async function loadGameAssets(){
-  const baseURL="https://vizualabstract.github.io/StarRailStaticAPI";
-  const assetURL=baseURL+"/assets/";
-
+  const baseURL="https://raw.githubusercontent.com/Mar-7th/StarRailRes/master";
+  const assetURL=baseURL+"/";
   try{
     const [characterResponse,lightConeResponse]=await Promise.all([
-      fetch(baseURL+"/db/cht/characters.json"),
-      fetch(baseURL+"/db/cht/light_cones.json")
+      fetch(baseURL+"/index_new/cht/characters.json"),
+      fetch(baseURL+"/index_new/cht/light_cones.json")
     ]);
 
     if(!characterResponse.ok||!lightConeResponse.ok){
