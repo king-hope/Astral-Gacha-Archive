@@ -891,8 +891,35 @@ $("exportBtn").addEventListener("click",()=>{
     JSON.stringify(backup,null,2),
     "application/json"
   );
-});$("exportCsvBtn").addEventListener("click",()=>{let cols=["date","pool","item_name","pity","result","rank","notes"];let csv=[cols.join(","),...records.map(r=>cols.map(c=>'"'+String(r[c]??"").replaceAll('"','""')+'"').join(","))].join("\n");download("astral-gacha-records.csv","\ufeff"+csv,"text/csv;charset=utf-8");});
-function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
+});
+$("exportCsvBtn").addEventListener("click",()=>{
+  const cols=[
+    "date",
+    "pool",
+    "item_name",
+    "pity",
+    "result",
+    "rank",
+    "sort_order",
+    "game_version",
+    "notes"
+  ];
+
+  const csv=[
+    cols.join(","),
+    ...records.map(r=>
+      cols.map(c=>
+        '"'+String(r[c]??"").replaceAll('"','""')+'"'
+      ).join(",")
+    )
+  ].join("\n");
+
+  download(
+    "astral-gacha-records.csv",
+    "\ufeff"+csv,
+    "text/csv;charset=utf-8"
+  );
+});function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
 const pityLimits = {
   character: 89,
   lightcone: 79,
