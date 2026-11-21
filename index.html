@@ -557,17 +557,9 @@ function getFilteredRecords(){
     });
 }
   
+
 function renderTable(){
-  let f=$("poolFilter").value;
-
-  let list=[...records]
-    .filter(r=>f==="all"||r.pool===f)
-    .sort((a,b)=>{
-      const dateCompare=b.date.localeCompare(a.date);
-      if(dateCompare!==0) return dateCompare;
-
-      return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
-    });
+  const list=getFilteredRecords();
 
   $("recordTable").innerHTML=list.length?`<div style="overflow:auto"><table><thead><tr><th>日期</th><th>卡池</th><th>名稱</th><th>抽數</th><th>結果</th><th>星魂／疊影</th><th>操作</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.date)}</td><td>${poolNames[r.pool]}</td><td>
   <div style="display:flex;align-items:center;gap:8px;">
@@ -585,6 +577,7 @@ function renderTable(){
 
   renderChart();
 }
+
 
 function renderChart(){
   let f=$("poolFilter").value;
