@@ -953,12 +953,103 @@ $("importFile").addEventListener("change", async e => {
       }
     }
 
-    alert(
-      "備份檔案檢查成功！\n\n" +
-      "抽卡紀錄：" + backup.records.length + " 筆\n" +
-      "保底狀態：" + Object.keys(backup.poolStates).length + " 個卡池\n\n" +
-      "目前尚未匯入任何資料。"
+    if (!user || !client) {
+  alert("請先使用 Google 登入，再匯入備份。");
+  return;
+}
+
+const uniqueRecords = [
+  ...new Map(backup.records.map(r => [r.id, r])).values()
+];
+
+const existingIds = new Set(records.map(r => String(r.id)));
+
+const newRecords = uniqueRecords.filter(
+  r => !existingIds.has(r.id)
+);
+
+const stateEntries = Object.entries(backup.poolStates);
+
+const confirmed = confirm(
+  "備份檔案檢查成功！\n\n" +
+  "備份抽卡紀錄：" + backup.records.length + " 筆\n" +
+  "其中可新增：" + newRecords.length + " 筆\n" +
+  "重複跳過：" + (backup.records.length - newRecords.length) + " 筆\n" +
+  "保底狀態：" + stateEntries.length + " 個卡池\n\n" +
+  "確定要合併匯入嗎？\n" +
+  "現有抽卡紀錄不會被刪除，但備份中的保底狀態會更新目前數值。"
+);
+
+if (!confirmed) return;
+
+// 新增抽卡紀錄
+if (newRecords.length > 0) {
+  const { error } = await client
+    .from("gacha_records")
+    .insert(
+      newRecords.map(r => ({
+        ...r,
+        user_id: user.id
+      }))
     );
+
+  if (error) {
+    alert("抽卡紀錄匯入失敗：" + error.message);
+    return;
+  }
+
+  records.push(...newRecords);
+  saveLocal();
+}
+
+// 還原卡池保底狀態
+if (stateEntries.length > 0) {
+  const stateRows = stateEntries.map(([pool, state]) => ({
+    user_id: user.id,
+    pool,
+    current_pity: Number(state.current_pity),
+    guaranteed:
+      pool === "character" || pool === "lightcone"
+        ? state.guaranteed
+        : false,
+    updated_at: new Date().toISOString()
+  }));
+
+  const { error } = await client
+    .from("gacha_pool_states")
+    .upsert(stateRows, {
+      onConflict: "user_id,pool"
+    });
+
+  if (error) {
+    render();
+    alert(
+      "抽卡紀錄已匯入，但保底狀態還原失敗：\n" +
+      error.message +
+      "\n\n請重新整理網站確認抽卡紀錄，並再次匯入備份。"
+    );
+    return;
+  }
+
+  for (const row of stateRows) {
+    poolStates[row.pool] = {
+      current_pity: row.current_pity,
+      guaranteed: row.guaranteed,
+      updated_at: row.updated_at
+    };
+  }
+}
+
+saveLocal();
+render();
+
+alert(
+  "備份匯入成功！\n\n" +
+  "新增抽卡紀錄：" + newRecords.length + " 筆\n" +
+  "跳過重複紀錄：" +
+  (backup.records.length - newRecords.length) + " 筆\n" +
+  "還原保底狀態：" + stateEntries.length + " 個卡池"
+);
 
   } catch (error) {
     alert("匯入檢查失敗：" + error.message);
