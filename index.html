@@ -289,67 +289,71 @@ function renderVersionStats(){
 
         return `
           <div class="panel" style="margin-top:14px;">
-            <h3>Version ${version}</h3>
+            <details ${version===versions[0]?"open":""}>
+  <summary style="cursor:pointer;font-size:18px;font-weight:700;padding:8px 0;">
+    Version ${version}
+  </summary>
 
-            <div class="grid">
-              <div class="stat">
-                <small>累計抽數</small>
-                <strong>${totalPulls.toLocaleString()}</strong>
-              </div>
+  <div class="grid">
+    <div class="stat">
+      <small>累計抽數</small>
+      <strong>${totalPulls.toLocaleString()}</strong>
+    </div>
 
-              <div class="stat">
-                <small>五星取得</small>
-                <strong>${list.length}</strong>
-              </div>
+    <div class="stat">
+      <small>五星取得</small>
+      <strong>${list.length}</strong>
+    </div>
 
-              <div class="stat">
-                <small>角色池抽數</small>
-                <strong>${character.reduce((s,r)=>s+Number(r.pity||0),0).toLocaleString()}</strong>
-              </div>
+    <div class="stat">
+      <small>角色池抽數</small>
+      <strong>${character.reduce((s,r)=>s+Number(r.pity||0),0).toLocaleString()}</strong>
+    </div>
 
-              <div class="stat">
-                <small>光錐池抽數</small>
-                <strong>${lightcone.reduce((s,r)=>s+Number(r.pity||0),0).toLocaleString()}</strong>
-              </div>
+    <div class="stat">
+      <small>光錐池抽數</small>
+      <strong>${lightcone.reduce((s,r)=>s+Number(r.pity||0),0).toLocaleString()}</strong>
+    </div>
 
-              <div class="stat">
-                <small>平均出金抽數</small>
-                <strong>${average}</strong>
-              </div>
+    <div class="stat">
+      <small>平均出金抽數</small>
+      <strong>${average}</strong>
+    </div>
 
-              <div class="stat">
-                <small>UP／歪卡</small>
-                <strong>${up}／${off}</strong>
-              </div>
-                        </div>
+    <div class="stat">
+      <small>UP／歪卡</small>
+      <strong>${up}／${off}</strong>
+    </div>
+  </div>
 
-            <div style="margin-top:20px;">
-              <h4>五星取得紀錄</h4>
+  <div style="margin-top:20px;">
+    <h4>五星取得紀錄</h4>
 
-              ${[...list]
-                .sort((a,b)=>{
-                  const dateCompare=b.date.localeCompare(a.date);
-                  if(dateCompare!==0) return dateCompare;
-                  return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
-                })
-                .map(r=>`
-                  <div class="row" style="padding:10px 0;border-bottom:1px solid var(--line);">
-                    <div>
-                      <strong>${esc(r.item_name)}</strong>
-                      <div class="muted">
-                        ${esc(r.date)} · ${r.pool==="character"?"角色活動躍遷":"光錐活動躍遷"}
-                      </div>
-                    </div>
-
-                    <div style="text-align:right;white-space:nowrap;">
-                      <strong>${r.pity} 抽</strong>
-                      <div class="muted" style="color:${r.result==="up"?"#D8B96E":"#D97878"};">
-                        ${r.result==="up"?"UP":"歪卡"}
-                      </div>
-                    </div>
-                  </div>
-                `).join("")}
+    ${[...list]
+      .sort((a,b)=>{
+        const dateCompare=b.date.localeCompare(a.date);
+        if(dateCompare!==0) return dateCompare;
+        return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
+      })
+      .map(r=>`
+        <div class="row" style="padding:10px 0;border-bottom:1px solid var(--line);">
+          <div>
+            <strong>${esc(r.item_name)}</strong>
+            <div class="muted">
+              ${esc(r.date)} · ${r.pool==="character"?"角色活動躍遷":"光錐活動躍遷"}
             </div>
+          </div>
+
+          <div style="text-align:right;white-space:nowrap;">
+            <strong>${r.pity} 抽</strong>
+            <div class="muted" style="color:${r.result==="up"?"#D8B96E":"#D97878"};">
+              ${r.result==="up"?"UP":"歪卡"}
+            </div>
+          </div>
+        </div>
+      `).join("")}
+  </div>
+</details>
           </div>
         `;
       }).join("")
