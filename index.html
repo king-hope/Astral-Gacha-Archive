@@ -1318,6 +1318,7 @@ async function loadCloud(){
   render();
 }
 
+
 async function init(){
   loadGameAssets();
 
@@ -1330,14 +1331,18 @@ async function init(){
   user=session?.user||null;
   updateAuth();
 
-  client.auth.onAuthStateChange(async(_event,session)=>{
+  client.auth.onAuthStateChange((_event,session)=>{
     user=session?.user||null;
     updateAuth();
-    if(user)await loadCloud();
+
+    if(user){
+      setTimeout(()=>loadCloud(),0);
+    }
   });
 
   if(user)await loadCloud();
 }
+
 function updateAuth(){
   $("authStatus").textContent=user?"已登入雲端":"尚未登入";
 
