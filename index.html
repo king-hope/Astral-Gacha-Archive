@@ -149,13 +149,22 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 </section>
 <section id="versions" class="hidden">
   <div class="panel">
+  <div class="row">
     <h2>版本統計</h2>
-    <p class="muted">依照遊戲版本整理角色活動與光錐活動的抽卡紀錄。</p>
 
-    <div id="versionList" class="empty">
-      目前沒有版本資料。
-    </div>
+    <select id="versionPoolFilter" style="width:auto">
+      <option value="all">全部卡池</option>
+      <option value="character">角色活動躍遷</option>
+      <option value="lightcone">光錐活動躍遷</option>
+    </select>
   </div>
+
+  <p class="muted">依照遊戲版本整理角色活動與光錐活動的抽卡紀錄。</p>
+
+  <div id="versionList" class="empty">
+    目前沒有版本資料。
+  </div>
+</div>
 </section>
 <section id="add" class="hidden"><div class="panel"><h2>新增五星紀錄</h2>
 <form id="recordForm"><div class="formgrid">
