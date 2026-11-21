@@ -716,6 +716,7 @@ $("poolStateForm").addEventListener("submit", async e => {
   alert("保底狀態已成功儲存至雲端！");
 });
 
+
 async function loadCloud(){
   const {data,error}=await client
     .from("gacha_records")
@@ -745,6 +746,27 @@ async function loadCloud(){
   });
 
   render();
+}
+
+async function init(){
+  loadGameAssets();
+
+  if(!supabaseReady){
+    $("authStatus").textContent="本機預覽";
+    return;
+  }
+
+  const {data:{session}}=await client.auth.getSession();
+  user=session?.user||null;
+  updateAuth();
+
+  client.auth.onAuthStateChange(async(_event,session)=>{
+    user=session?.user||null;
+    updateAuth();
+    if(user)await loadCloud();
+  });
+
+  if(user)await loadCloud();
 }
 
 async function init(){
