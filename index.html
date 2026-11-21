@@ -815,9 +815,31 @@ async function loadCloud(){
     return;
   }
 
-  records=data||[];
-  saveLocal();
+    records=data||[];
 
+  const missingVersions=records.filter(r=>
+    !r.game_version &&
+    ["character","lightcone"].includes(r.pool) &&
+    getVersionByDate(r.date)
+  );
+
+  for(const record of missingVersions){
+    const version=getVersionByDate(record.date);
+
+    const {error:updateError}=await client
+      .from("gacha_records")
+      .update({game_version:version})
+      .eq("id",record.id);
+
+    if(updateError){
+      $("cloudInfo").textContent="補齊版本資料失敗："+updateError.message;
+      return;
+    }
+
+    record.game_version=version;
+  }
+
+  saveLocal();
   const {data:states,error:stateError}=await client
     .from("gacha_pool_states")
     .select("*");
