@@ -516,7 +516,47 @@ $("pitySummary").innerHTML=pools.map(p=>{
  renderVersionStats();
 }
 
+function getFilteredRecords(){
+  const pool=$("poolFilter").value;
+  const keyword=$("recordSearch").value.trim().toLowerCase();
+  const result=$("resultFilter").value;
+  const startDate=$("recordStartDate").value;
+  const endDate=$("recordEndDate").value;
 
+  return [...records]
+    .filter(r=>{
+      const matchPool=
+        pool==="all" || r.pool===pool;
+
+      const matchName=
+        !keyword ||
+        String(r.item_name||"").toLowerCase().includes(keyword);
+
+      const matchResult=
+        result==="all" || r.result===result;
+
+      const matchStart=
+        !startDate || r.date>=startDate;
+
+      const matchEnd=
+        !endDate || r.date<=endDate;
+
+      return (
+        matchPool &&
+        matchName &&
+        matchResult &&
+        matchStart &&
+        matchEnd
+      );
+    })
+    .sort((a,b)=>{
+      const dateCompare=b.date.localeCompare(a.date);
+      if(dateCompare!==0) return dateCompare;
+
+      return (Number(b.sort_order)||0)-(Number(a.sort_order)||0);
+    });
+}
+  
 function renderTable(){
   let f=$("poolFilter").value;
 
