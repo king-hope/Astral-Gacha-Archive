@@ -509,6 +509,55 @@ function updatePlannerResourceSummary(){
   $("plannerTotalPulls").textContent = totalPulls;
 }
 
+
+$("savePlannerResources").addEventListener("click",async()=>{
+  if(!user || !client){
+    alert("請先使用 Google 登入。");
+    return;
+  }
+
+  const jade=Number($("plannerJade").value);
+  const passes=Number($("plannerPasses").value);
+
+  if(
+    !Number.isSafeInteger(jade) ||
+    !Number.isSafeInteger(passes) ||
+    jade<0 ||
+    passes<0
+  ){
+    alert("星瓊與專票必須是大於或等於 0 的整數。");
+    return;
+  }
+
+  const {error}=await client
+    .from("gacha_resources")
+    .upsert({
+      user_id:user.id,
+      stellar_jade:jade,
+      special_passes:passes,
+      updated_at:new Date().toISOString()
+    },{
+      onConflict:"user_id"
+    });
+
+  if(error){
+    $("plannerResourceStatus").textContent=
+      "儲存失敗："+error.message;
+    return;
+  }
+
+  plannerResources={
+    stellar_jade:jade,
+    special_passes:passes
+  };
+
+  updatePlannerResourceSummary();
+
+  $("plannerResourceStatus").textContent=
+    "資源已成功儲存至雲端。";
+});
+
+  
 $("plannerJade").addEventListener(
   "input",
   updatePlannerResourceSummary
