@@ -558,6 +558,30 @@ function calculatePlannerPity(pool){
   };
 }
 
+
+function updatePlannerPitySummary(){
+  const pool=$("plannerPool").value;
+  const result=calculatePlannerPity(pool);
+
+  $("plannerCurrentPity").textContent=result.pity;
+  $("plannerNextFive").textContent=result.pullsToFive;
+  $("plannerGuarantee").textContent=
+    result.guaranteed?"大保底":"未大保底";
+  $("plannerUPPulls").textContent=result.pullsToUP;
+
+  $("plannerPityStatus").textContent=
+    `目前為${pool==="character"?"角色活動躍遷":"光錐活動躍遷"}，`+
+    `硬保底為 ${result.limit} 抽。`+
+    `最壞情況下，還需要 ${result.pullsToUP} 抽才能保證取得 UP。`;
+}
+
+$("plannerPool").addEventListener(
+  "change",
+  updatePlannerPitySummary
+);
+
+updatePlannerPitySummary();
+
   
 function updatePlannerResourceSummary(){
   const jade = Math.max(
