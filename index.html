@@ -204,9 +204,59 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
     <p class="muted">
       管理目前持有的星瓊與星軌專票，規劃下一個目標。
     </p>
-    <div id="plannerContent" class="empty">
-      抽卡規劃器準備中……
+    
+<div class="panel">
+  <h3>目前持有資源</h3>
+  <p class="muted">保存後，登入帳號即可在不同裝置繼續使用。</p>
+
+  <label for="plannerJade">星瓊</label>
+  <input
+    id="plannerJade"
+    type="number"
+    min="0"
+    step="1"
+    value="0"
+    placeholder="輸入目前持有的星瓊"
+  >
+
+  <label for="plannerPasses">星軌專票</label>
+  <input
+    id="plannerPasses"
+    type="number"
+    min="0"
+    step="1"
+    value="0"
+    placeholder="輸入目前持有的專票"
+  >
+
+  <button type="button" id="savePlannerResources">
+    儲存目前資源
+  </button>
+
+  <p id="plannerResourceStatus" class="muted">
+    尚未載入資源資料。
+  </p>
+</div>
+
+<div class="panel">
+  <h3>資源換算</h3>
+  <div class="grid">
+    <div class="stat">
+      <small>星瓊可兌換抽數</small>
+      <strong id="plannerJadePulls">0</strong>
     </div>
+    <div class="stat">
+      <small>專票數量</small>
+      <strong id="plannerPassPulls">0</strong>
+    </div>
+    <div class="stat">
+      <small>目前總抽數</small>
+      <strong id="plannerTotalPulls">0</strong>
+    </div>
+  </div>
+  <p class="hint">160 星瓊可兌換 1 張星軌專票，未滿 160 的星瓊會保留。</p>
+</div>
+
   </div>
 </section>  
 <section id="add" class="hidden"><div class="panel"><h2>新增五星紀錄</h2>
