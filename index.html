@@ -616,7 +616,15 @@ function updatePlannerPitySummary(){
     Math.floor(Number($("plannerPasses").value)||0)
   );
 
-  const availablePulls=Math.floor(jade/160)+passes;
+  const starlight=Math.max(
+  0,
+  Math.floor(Number($("plannerStarlight").value)||0)
+);
+
+  const availablePulls=
+  Math.floor(jade/160)+
+  passes+
+  Math.floor(starlight/20);
   const requiredPulls=result.pullsToUP;
   const gap=Math.max(0,requiredPulls-availablePulls);
 
