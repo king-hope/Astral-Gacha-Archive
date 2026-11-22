@@ -1056,6 +1056,39 @@ $("statsResultDistribution").innerHTML = resultTotal
       `;
     }).join("")
   : '<p class="muted">尚無五星紀錄</p>';
+ // 出金抽數分布
+const pityLimit = selectedStatsPool === "lightcone" ? 80 : 90;
+const pityRanges = Array.from(
+  { length: pityLimit / 10 },
+  (_, i) => ({
+    start: i * 10 + 1,
+    end: (i + 1) * 10
+  })
+);
+
+$("statsPityDistribution").innerHTML = poolRecords.length
+  ? pityRanges.map(range => {
+      const count = poolRecords.filter(r => {
+        const pity = Number(r.pity);
+        return pity >= range.start && pity <= range.end;
+      }).length;
+
+      const percent = count / poolRecords.length * 100;
+
+      return `
+        <div style="margin:14px 0;">
+          <div style="display:flex;justify-content:space-between;gap:12px;">
+            <span>${range.start}–${range.end} 抽</span>
+            <strong>${count} 次（${percent.toFixed(1)}%）</strong>
+          </div>
+
+          <div style="height:9px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:7px;">
+            <div style="height:100%;width:${percent}%;background:#8996D4;border-radius:99px;"></div>
+          </div>
+        </div>
+      `;
+    }).join("")
+  : '<p class="muted">尚無五星紀錄</p>'; 
  const sorted=[...records].sort((a,b)=>{
   const dateCompare=b.date.localeCompare(a.date);
   if(dateCompare!==0) return dateCompare;
