@@ -842,7 +842,8 @@ $("recordTable").addEventListener("click",e=>{
  if(edit)editRecord(edit.dataset.edit);
  if(del)deleteRecord(del.dataset.delete);
 });
-document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["overview","records","versions","add","settings"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));}));
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+  ["overview","records","versions","planner","add","settings"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab));}));
 $("poolFilter").addEventListener("change",()=>{
   renderTable();
   renderChart();
