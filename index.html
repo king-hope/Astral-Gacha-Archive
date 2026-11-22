@@ -38,6 +38,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <button class="active" data-tab="overview">總覽</button>
 <button data-tab="records">抽卡紀錄</button>
 <button data-tab="versions">版本統計</button>
+<button data-tab="planner">抽卡規劃器</button>  
 <button data-tab="add">新增五星</button>
 <button data-tab="settings">設定</button>
 </nav>
@@ -197,6 +198,17 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
   </div>
 </div>
 </section>
+<section id="planner" class="hidden">
+  <div class="panel">
+    <h2>抽卡規劃器</h2>
+    <p class="muted">
+      管理目前持有的星瓊與星軌專票，規劃下一個目標。
+    </p>
+    <div id="plannerContent" class="empty">
+      抽卡規劃器準備中……
+    </div>
+  </div>
+</section>  
 <section id="add" class="hidden"><div class="panel"><h2>新增五星紀錄</h2>
 <form id="recordForm"><div class="formgrid">
 <div><label>取得日期</label><input type="date" id="date" required></div>
