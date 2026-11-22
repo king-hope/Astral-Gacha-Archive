@@ -732,8 +732,28 @@ function updatePlannerResourceSummary(){
   const jadePulls=Math.floor(jade/160);
   const starlightPulls=Math.floor(starlight/20);
 
-  const totalPulls=
-    jadePulls+passes+starlightPulls;
+  const extraJade=Math.max(
+  0,
+  Math.floor(Number($("plannerExtraJade").value)||0)
+);
+
+const extraPasses=Math.max(
+  0,
+  Math.floor(Number($("plannerExtraPasses").value)||0)
+);
+
+const extraStarlight=Math.max(
+  0,
+  Math.floor(Number($("plannerExtraStarlight").value)||0)
+);
+
+const totalPulls=
+  jadePulls+
+  passes+
+  starlightPulls+
+  Math.floor(extraJade/160)+
+  extraPasses+
+  Math.floor(extraStarlight/20);
 
   $("plannerJadePulls").textContent=jadePulls;
   $("plannerPassPulls").textContent=passes;
@@ -756,6 +776,21 @@ $("plannerStarlight").addEventListener(
   updatePlannerResourceSummary
 );
 
+$("plannerExtraJade").addEventListener(
+  "input",
+  updatePlannerResourceSummary
+);
+
+$("plannerExtraPasses").addEventListener(
+  "input",
+  updatePlannerResourceSummary
+);
+
+$("plannerExtraStarlight").addEventListener(
+  "input",
+  updatePlannerResourceSummary
+);
+  
 updatePlannerResourceSummary();
 
 
