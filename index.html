@@ -667,24 +667,52 @@ $("plannerPool").addEventListener(
 updatePlannerPitySummary();
 
   
+
 function updatePlannerResourceSummary(){
-  const jade = Math.max(
+  const jade=Math.max(
     0,
-    Math.floor(Number($("plannerJade").value) || 0)
+    Math.floor(Number($("plannerJade").value)||0)
   );
 
-  const passes = Math.max(
+  const passes=Math.max(
     0,
-    Math.floor(Number($("plannerPasses").value) || 0)
+    Math.floor(Number($("plannerPasses").value)||0)
   );
 
-  const jadePulls = Math.floor(jade / 160);
-  const totalPulls = jadePulls + passes;
+  const starlight=Math.max(
+    0,
+    Math.floor(Number($("plannerStarlight").value)||0)
+  );
 
-  $("plannerJadePulls").textContent = jadePulls;
-  $("plannerPassPulls").textContent = passes;
-  $("plannerTotalPulls").textContent = totalPulls;
+  const jadePulls=Math.floor(jade/160);
+  const starlightPulls=Math.floor(starlight/20);
+
+  const totalPulls=
+    jadePulls+passes+starlightPulls;
+
+  $("plannerJadePulls").textContent=jadePulls;
+  $("plannerPassPulls").textContent=passes;
+  $("plannerStarlightPulls").textContent=starlightPulls;
+  $("plannerTotalPulls").textContent=totalPulls;
 }
+
+$("plannerJade").addEventListener(
+  "input",
+  updatePlannerResourceSummary
+);
+
+$("plannerPasses").addEventListener(
+  "input",
+  updatePlannerResourceSummary
+);
+
+$("plannerStarlight").addEventListener(
+  "input",
+  updatePlannerResourceSummary
+);
+
+updatePlannerResourceSummary();
+
 
 
 
