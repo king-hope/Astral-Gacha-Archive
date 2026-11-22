@@ -712,7 +712,44 @@ const availablePulls=
   Math.floor(extraStarlight/20);
   const requiredPulls=result.pullsToUP;
   const gap=Math.max(0,requiredPulls-availablePulls);
+  
+// 合併目前資源與臨時模擬資源
+const totalJade=jade+extraJade;
+const totalPasses=passes+extraPasses;
+const totalStarlight=starlight+extraStarlight;
 
+// 依序消耗：專票 → 星瓊 → 星芒
+let pullsToSpend=requiredPulls;
+
+// 優先使用已持有的專票
+const passesUsed=Math.min(totalPasses,pullsToSpend);
+const remainingPasses=totalPasses-passesUsed;
+pullsToSpend-=passesUsed;
+
+// 再使用星瓊
+const jadePullsAvailable=Math.floor(totalJade/160);
+const jadePullsUsed=Math.min(
+  jadePullsAvailable,
+  pullsToSpend
+);
+const remainingJade=totalJade-jadePullsUsed*160;
+pullsToSpend-=jadePullsUsed;
+
+// 最後使用未熄的星芒
+const starlightPullsAvailable=Math.floor(totalStarlight/20);
+const starlightPullsUsed=Math.min(
+  starlightPullsAvailable,
+  pullsToSpend
+);
+const remainingStarlight=
+  totalStarlight-starlightPullsUsed*20;
+
+const remainingPulls=
+  Math.floor(remainingJade/160)+
+  remainingPasses+
+  Math.floor(remainingStarlight/20);
+
+  
   $("plannerCurrentPity").textContent=result.pity;
   $("plannerNextFive").textContent=result.pullsToFive;
   $("plannerGuarantee").textContent=
@@ -727,7 +764,23 @@ const availablePulls=
   $("plannerRequiredPulls").textContent=requiredPulls;
   $("plannerAvailablePulls").textContent=availablePulls;
   $("plannerPullGap").textContent=gap;
+  $("plannerRemainingJade").textContent=
+  remainingJade.toLocaleString();
 
+$("plannerRemainingPasses").textContent=
+  remainingPasses.toLocaleString();
+
+$("plannerRemainingStarlight").textContent=
+  remainingStarlight.toLocaleString();
+
+$("plannerRemainingPulls").textContent=
+  remainingPulls.toLocaleString();
+
+$("plannerRemainingStatus").textContent=
+  availablePulls>=requiredPulls
+    ?"已扣除保證取得 UP 所需抽數，以上為預計剩餘資源。"
+    :"目前資源不足，以上為用盡可兌換資源後的預計餘額。";
+  
   $("plannerResourceResult").textContent=
     availablePulls>=requiredPulls
       ?"目前資源足夠，可以保證取得當期 UP。"
