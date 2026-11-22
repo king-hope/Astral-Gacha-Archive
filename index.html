@@ -1425,13 +1425,36 @@ async function loadCloud(){
     return;
   }
 
+  
   poolStates={};
   (states||[]).forEach(state=>{
     poolStates[state.pool]=state;
   });
 
+  // 讀取目前保存的抽卡資源
+  const {data:resources,error:resourceError}=await client
+    .from("gacha_resources")
+    .select("*")
+    .maybeSingle();
+
+  if(resourceError){
+    $("cloudInfo").textContent="讀取資源資料失敗："+resourceError.message;
+    return;
+  }
+
+  plannerResources={
+    stellar_jade:resources?.stellar_jade??0,
+    special_passes:resources?.special_passes??0
+  };
+
+  $("plannerJade").value=plannerResources.stellar_jade;
+  $("plannerPasses").value=plannerResources.special_passes;
+
+  updatePlannerResourceSummary();
+
   render();
 }
+
 
 
 async function init(){
