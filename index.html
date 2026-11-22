@@ -683,6 +683,7 @@ function updatePlannerResourceSummary(){
 }
 
 
+
 $("savePlannerResources").addEventListener("click",async()=>{
   if(!user || !client){
     alert("請先使用 Google 登入。");
@@ -691,14 +692,17 @@ $("savePlannerResources").addEventListener("click",async()=>{
 
   const jade=Number($("plannerJade").value);
   const passes=Number($("plannerPasses").value);
+  const starlight=Number($("plannerStarlight").value);
 
   if(
     !Number.isSafeInteger(jade) ||
     !Number.isSafeInteger(passes) ||
+    !Number.isSafeInteger(starlight) ||
     jade<0 ||
-    passes<0
+    passes<0 ||
+    starlight<0
   ){
-    alert("星瓊與專票必須是大於或等於 0 的整數。");
+    alert("星瓊、專票與星芒都必須是大於或等於 0 的整數。");
     return;
   }
 
@@ -708,6 +712,7 @@ $("savePlannerResources").addEventListener("click",async()=>{
       user_id:user.id,
       stellar_jade:jade,
       special_passes:passes,
+      undying_starlight:starlight,
       updated_at:new Date().toISOString()
     },{
       onConflict:"user_id"
@@ -721,7 +726,8 @@ $("savePlannerResources").addEventListener("click",async()=>{
 
   plannerResources={
     stellar_jade:jade,
-    special_passes:passes
+    special_passes:passes,
+    undying_starlight:starlight
   };
 
   updatePlannerResourceSummary();
@@ -729,6 +735,7 @@ $("savePlannerResources").addEventListener("click",async()=>{
   $("plannerResourceStatus").textContent=
     "資源已成功儲存至雲端。";
 });
+
 
   
 $("plannerJade").addEventListener(
