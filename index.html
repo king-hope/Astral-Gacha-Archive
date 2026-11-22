@@ -1150,6 +1150,110 @@ $("statsPityDistribution").innerHTML = poolRecords.length
       `;
     }).join("")
   : '<p class="muted">尚無五星紀錄</p>'; 
+ // 出金運氣分析
+const luckLimit = selectedStatsPool === "lightcone" ? 80 : 90;
+const isLightcone = selectedStatsPool === "lightcone";
+
+function getLuckProbability(pity) {
+  let survival = 1;
+
+  for (let i = 1; i <= pity; i++) {
+    let probability;
+
+    if (i >= luckLimit) {
+      probability = 1;
+    } else if (isLightcone) {
+      probability = i < 67
+        ? 0.008
+        : Math.min(1, 0.008 + (i - 66) * 0.07);
+    } else {
+      probability = i < 74
+        ? 0.006
+        : Math.min(1, 0.006 + (i - 73) * 0.06);
+    }
+
+    survival *= (1 - probability);
+  }
+
+  return (1 - survival) * 100;
+}
+
+function getLuckCategory(percent) {
+  if (percent <= 25) return "歐皇降臨";
+  if (percent <= 50) return "歐氣滿滿";
+  if (percent <= 75) return "正常發揮";
+  if (percent <= 90) return "非氣纏身";
+  return "非酋附體";
+}
+
+const luckRecords = poolRecords
+  .map(record => {
+    const pity = Number(record.pity);
+
+    if (!Number.isFinite(pity) || pity < 1 || pity > luckLimit) {
+      return null;
+    }
+
+    const probability = getLuckProbability(pity);
+
+    return {
+      ...record,
+      luckProbability: probability,
+      luckCategory: getLuckCategory(probability)
+    };
+  })
+  .filter(Boolean);
+
+const luckCategories = [
+  "歐皇降臨",
+  "歐氣滿滿",
+  "正常發揮",
+  "非氣纏身",
+  "非酋附體"
+];
+
+const luckTotal = luckRecords.length;
+
+$("statsLuckAnalysis").innerHTML = luckTotal
+  ? `
+    <div style="margin-bottom:20px;">
+      ${luckCategories.map(category => {
+        const count = luckRecords.filter(
+          r => r.luckCategory === category
+        ).length;
+
+        const percent = count / luckTotal * 100;
+
+        return `
+          <div style="margin:14px 0;">
+            <div style="display:flex;justify-content:space-between;gap:12px;">
+              <strong>${category}</strong>
+              <span>${count} 次（${percent.toFixed(1)}%）</span>
+            </div>
+            <div style="height:9px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:7px;">
+              <div style="height:100%;width:${percent}%;background:#8996D4;border-radius:99px;"></div>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    <h3>五星紀錄個別分析</h3>
+
+    ${luckRecords.map(record => `
+      <div style="padding:12px 0;border-top:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <strong>${record.item_name || "未命名五星"}</strong>
+          <strong>${record.luckCategory}</strong>
+        </div>
+        <p class="muted" style="margin:5px 0 0;">
+          ${record.date || ""}・第 ${record.pity} 抽出金
+          ・累積出金機率 ${record.luckProbability.toFixed(1)}%
+        </p>
+      </div>
+    `).join("")}
+  `
+  : '<p class="muted">尚無五星紀錄</p>'; 
  const sorted=[...records].sort((a,b)=>{
   const dateCompare=b.date.localeCompare(a.date);
   if(dateCompare!==0) return dateCompare;
