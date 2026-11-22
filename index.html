@@ -257,6 +257,42 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
   <p class="hint">160 星瓊可兌換 1 張星軌專票，未滿 160 的星瓊會保留。</p>
 </div>
 
+<div class="panel">
+  <h3>保底規劃</h3>
+
+  <label for="plannerPool">目標卡池</label>
+  <select id="plannerPool">
+    <option value="character">角色活動躍遷</option>
+    <option value="lightcone">光錐活動躍遷</option>
+  </select>
+
+  <div class="grid">
+    <div class="stat">
+      <small>目前墊抽數</small>
+      <strong id="plannerCurrentPity">0</strong>
+    </div>
+
+    <div class="stat">
+      <small>距離下一個五星</small>
+      <strong id="plannerNextFive">90</strong>
+    </div>
+
+    <div class="stat">
+      <small>目前保底狀態</small>
+      <strong id="plannerGuarantee">未大保底</strong>
+    </div>
+
+    <div class="stat">
+      <small>保證取得 UP 最多需要</small>
+      <strong id="plannerUPPulls">180</strong>
+    </div>
+  </div>
+
+  <p id="plannerPityStatus" class="hint">
+    請先確認目前的卡池保底狀態。
+  </p>
+</div>
+
   </div>
 </section>  
 <section id="add" class="hidden"><div class="panel"><h2>新增五星紀錄</h2>
