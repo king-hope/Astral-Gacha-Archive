@@ -996,7 +996,58 @@ $("plannerPasses").addEventListener(
 
 updatePlannerResourceSummary();
 
-  
+// 出金運氣估算
+function calculateLuck(pity, pool) {
+  const limit = pool === "lightcone" ? 80 : 90;
+  const baseRate = pool === "lightcone" ? 0.008 : 0.006;
+  const softStart = pool === "lightcone" ? 67 : 74;
+
+  pity = Number(pity);
+
+  if (
+    !Number.isInteger(pity) ||
+    pity < 1 ||
+    pity > limit
+  ) {
+    return null;
+  }
+
+  let survivalRate = 1;
+
+  for (let pull = 1; pull <= pity; pull++) {
+    let rate = baseRate;
+
+    if (pull >= softStart) {
+      const progress =
+        (pull - softStart) / (limit - softStart);
+
+      rate = baseRate + (1 - baseRate) * progress;
+    }
+
+    survivalRate *= (1 - rate);
+  }
+
+  const cumulativeChance = 1 - survivalRate;
+
+  let label;
+
+  if (cumulativeChance <= 0.25) {
+    label = "歐皇降臨";
+  } else if (cumulativeChance <= 0.50) {
+    label = "歐氣滿滿";
+  } else if (cumulativeChance <= 0.75) {
+    label = "正常發揮";
+  } else if (cumulativeChance <= 0.90) {
+    label = "非氣纏身";
+  } else {
+    label = "非酋附體";
+  }
+
+  return {
+    chance: cumulativeChance,
+    label
+  };
+}  
 function render(){
  const poolRecords = records.filter(r => r.pool === selectedStatsPool);
 
