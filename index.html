@@ -997,10 +997,10 @@ $("plannerPasses").addEventListener(
 updatePlannerResourceSummary();
 
 // 出金運氣估算
+
 function calculateLuck(pity, pool) {
   const limit = pool === "lightcone" ? 80 : 90;
-  const baseRate = pool === "lightcone" ? 0.008 : 0.006;
-  const softStart = pool === "lightcone" ? 67 : 74;
+  const isLightcone = pool === "lightcone";
 
   pity = Number(pity);
 
@@ -1015,39 +1015,45 @@ function calculateLuck(pity, pool) {
   let survivalRate = 1;
 
   for (let pull = 1; pull <= pity; pull++) {
-    let rate = baseRate;
+    let rate;
 
-    if (pull >= softStart) {
-      const progress =
-        (pull - softStart) / (limit - softStart);
-
-      rate = baseRate + (1 - baseRate) * progress;
+    if (pull >= limit) {
+      rate = 1;
+    } else if (isLightcone) {
+      rate = pull < 67
+        ? 0.008
+        : Math.min(1, 0.008 + (pull - 66) * 0.07);
+    } else {
+      rate = pull < 74
+        ? 0.006
+        : Math.min(1, 0.006 + (pull - 73) * 0.06);
     }
 
     survivalRate *= (1 - rate);
   }
 
-  const cumulativeChance = 1 - survivalRate;
+  const chance = (1 - survivalRate) * 100;
 
   let label;
 
-  if (cumulativeChance <= 0.25) {
+  if (chance <= 25) {
     label = "歐皇降臨";
-  } else if (cumulativeChance <= 0.50) {
+  } else if (chance <= 50) {
     label = "歐氣滿滿";
-  } else if (cumulativeChance <= 0.75) {
+  } else if (chance <= 75) {
     label = "正常發揮";
-  } else if (cumulativeChance <= 0.90) {
+  } else if (chance <= 90) {
     label = "非氣纏身";
   } else {
     label = "非酋附體";
   }
 
   return {
-    chance: cumulativeChance,
+    chance,
     label
   };
-}  
+}
+
 function render(){
  const poolRecords = records.filter(r => r.pool === selectedStatsPool);
 
