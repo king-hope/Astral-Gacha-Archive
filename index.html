@@ -658,10 +658,28 @@ function updatePlannerPitySummary(){
   Math.floor(Number($("plannerStarlight").value)||0)
 );
 
-  const availablePulls=
+  const extraJade=Math.max(
+  0,
+  Math.floor(Number($("plannerExtraJade").value)||0)
+);
+
+const extraPasses=Math.max(
+  0,
+  Math.floor(Number($("plannerExtraPasses").value)||0)
+);
+
+const extraStarlight=Math.max(
+  0,
+  Math.floor(Number($("plannerExtraStarlight").value)||0)
+);
+
+const availablePulls=
   Math.floor(jade/160)+
   passes+
-  Math.floor(starlight/20);
+  Math.floor(starlight/20)+
+  Math.floor(extraJade/160)+
+  extraPasses+
+  Math.floor(extraStarlight/20);
   const requiredPulls=result.pullsToUP;
   const gap=Math.max(0,requiredPulls-availablePulls);
 
@@ -701,6 +719,21 @@ $("plannerPasses").addEventListener(
   updatePlannerPitySummary
 );
 
+$("plannerExtraJade").addEventListener(
+  "input",
+  updatePlannerPitySummary
+);
+
+$("plannerExtraPasses").addEventListener(
+  "input",
+  updatePlannerPitySummary
+);
+
+$("plannerExtraStarlight").addEventListener(
+  "input",
+  updatePlannerPitySummary
+);
+  
 updatePlannerPitySummary();
 
 
