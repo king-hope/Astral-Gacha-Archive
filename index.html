@@ -1151,65 +1151,28 @@ const pityRanges = Array.from(
   })
 );
 
-const pityValues = poolRecords
-  .map(r => Number(r.pity))
-  .filter(pity => Number.isFinite(pity) && pity > 0);
+$("statsPityDistribution").innerHTML = poolRecords.length
+  ? pityRanges.map(range => {
+      const count = poolRecords.filter(r => {
+        const pity = Number(r.pity);
+        return pity >= range.start && pity <= range.end;
+      }).length;
 
-const pityTotal = pityValues.length;
+      const percent = count / poolRecords.length * 100;
 
-const averagePity = pityTotal
-  ? pityValues.reduce((sum, pity) => sum + pity, 0) / pityTotal
-  : 0;
+      return `
+        <div style="margin:14px 0;">
+          <div style="display:flex;justify-content:space-between;gap:12px;">
+            <span>${range.start}–${range.end} 抽</span>
+            <strong>${count} 次（${percent.toFixed(1)}%）</strong>
+          </div>
 
-const minPity = pityTotal ? Math.min(...pityValues) : 0;
-const maxPity = pityTotal ? Math.max(...pityValues) : 0;
-
-$("statsPityDistribution").innerHTML = pityTotal
-  ? `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:16px;">
-      <div class="stat">
-        <span class="muted">五星紀錄</span>
-        <strong>${pityTotal} 次</strong>
-      </div>
-      <div class="stat">
-        <span class="muted">平均出金</span>
-        <strong>${averagePity.toFixed(1)} 抽</strong>
-      </div>
-      <div class="stat">
-        <span class="muted">最低／最高</span>
-        <strong>${minPity}／${maxPity} 抽</strong>
-      </div>
-    </div>
-
-    <details>
-      <summary style="cursor:pointer;font-weight:600;">
-        查看各抽數區間分布
-      </summary>
-
-      <div style="margin-top:12px;">
-        ${pityRanges.map(range => {
-          const count = pityValues.filter(
-            pity => pity >= range.start && pity <= range.end
-          ).length;
-
-          const percent = count / pityTotal * 100;
-
-          return `
-            <div style="margin:14px 0;">
-              <div style="display:flex;justify-content:space-between;gap:12px;">
-                <span>${range.start}–${range.end} 抽</span>
-                <strong>${count} 次（${percent.toFixed(1)}%）</strong>
-              </div>
-
-              <div style="height:9px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:7px;">
-                <div style="height:100%;width:${percent}%;background:#8996D4;border-radius:99px;"></div>
-              </div>
-            </div>
-          `;
-        }).join("")}
-      </div>
-    </details>
-  `
+          <div style="height:9px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:7px;">
+            <div style="height:100%;width:${percent}%;background:#8996D4;border-radius:99px;"></div>
+          </div>
+        </div>
+      `;
+    }).join("")
   : '<p class="muted">尚無五星紀錄</p>';
 
  // 出金運氣分析
