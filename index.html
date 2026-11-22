@@ -586,21 +586,63 @@ function calculatePlannerPity(pool){
 }
 
 
+
 function updatePlannerPitySummary(){
   const pool=$("plannerPool").value;
   const result=calculatePlannerPity(pool);
+
+  const jade=Math.max(
+    0,
+    Math.floor(Number($("plannerJade").value)||0)
+  );
+
+  const passes=Math.max(
+    0,
+    Math.floor(Number($("plannerPasses").value)||0)
+  );
+
+  const availablePulls=Math.floor(jade/160)+passes;
+  const requiredPulls=result.pullsToUP;
+  const gap=Math.max(0,requiredPulls-availablePulls);
 
   $("plannerCurrentPity").textContent=result.pity;
   $("plannerNextFive").textContent=result.pullsToFive;
   $("plannerGuarantee").textContent=
     result.guaranteed?"大保底":"未大保底";
-  $("plannerUPPulls").textContent=result.pullsToUP;
+  $("plannerUPPulls").textContent=requiredPulls;
 
   $("plannerPityStatus").textContent=
     `目前為${pool==="character"?"角色活動躍遷":"光錐活動躍遷"}，`+
     `硬保底為 ${result.limit} 抽。`+
-    `最壞情況下，還需要 ${result.pullsToUP} 抽才能保證取得 UP。`;
+    `最壞情況下，還需要 ${requiredPulls} 抽才能保證取得 UP。`;
+
+  $("plannerRequiredPulls").textContent=requiredPulls;
+  $("plannerAvailablePulls").textContent=availablePulls;
+  $("plannerPullGap").textContent=gap;
+
+  $("plannerResourceResult").textContent=
+    availablePulls>=requiredPulls
+      ?"目前資源足夠，可以保證取得當期 UP。"
+      :`目前資源不足，還差 ${gap} 抽才能保證取得當期 UP。`;
 }
+
+$("plannerPool").addEventListener(
+  "change",
+  updatePlannerPitySummary
+);
+
+$("plannerJade").addEventListener(
+  "input",
+  updatePlannerPitySummary
+);
+
+$("plannerPasses").addEventListener(
+  "input",
+  updatePlannerPitySummary
+);
+
+updatePlannerPitySummary();
+
 
 $("plannerPool").addEventListener(
   "change",
