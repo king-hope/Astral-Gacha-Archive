@@ -490,6 +490,39 @@ const versionRecords=records.filter(r=>
 }
 
 
+function calculatePlannerPity(pool){
+  const state=poolStates[pool]||{
+    current_pity:0,
+    guaranteed:false
+  };
+
+  const limit=pool==="character"?90:80;
+  const pity=Math.min(
+    limit,
+    Math.max(0,Number(state.current_pity)||0)
+  );
+
+  const guaranteed=!!state.guaranteed;
+
+  // 距離下一個五星的最壞情況
+  const pullsToFive=limit-pity;
+
+  // 已經大保底：下一個五星就是 UP
+  // 尚未大保底：最壞情況需要再經歷一次歪卡
+  const pullsToUP=guaranteed
+    ? pullsToFive
+    : pullsToFive+limit;
+
+  return {
+    pity,
+    guaranteed,
+    limit,
+    pullsToFive,
+    pullsToUP
+  };
+}
+
+  
 function updatePlannerResourceSummary(){
   const jade = Math.max(
     0,
