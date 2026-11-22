@@ -1228,8 +1228,13 @@ $("statsLuckAnalysis").innerHTML = luckTotal
       }).join("")}
     </div>
 
-    <h3>五星紀錄個別分析</h3>
+    
+<details style="margin-top:20px;">
+  <summary style="cursor:pointer;font-weight:600;">
+    查看五星紀錄個別分析（${luckTotal} 筆）
+  </summary>
 
+  <div style="margin-top:12px;">
     ${luckRecords.map(record => `
       <div style="padding:12px 0;border-top:1px solid var(--border);">
         <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
@@ -1242,6 +1247,9 @@ $("statsLuckAnalysis").innerHTML = luckTotal
         </p>
       </div>
     `).join("")}
+  </div>
+</details>
+
   `
   : '<p class="muted">尚無五星紀錄</p>';
 
