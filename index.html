@@ -1665,12 +1665,15 @@ async function loadCloud(){
   }
 
   plannerResources={
-    stellar_jade:resources?.stellar_jade??0,
-    special_passes:resources?.special_passes??0
-  };
+  stellar_jade:resources?.stellar_jade??0,
+  special_passes:resources?.special_passes??0,
+  undying_starlight:resources?.undying_starlight??0
+};
 
   $("plannerJade").value=plannerResources.stellar_jade;
   $("plannerPasses").value=plannerResources.special_passes;
+  $("plannerStarlight").value=
+  plannerResources.undying_starlight;
 
   updatePlannerResourceSummary();
 
