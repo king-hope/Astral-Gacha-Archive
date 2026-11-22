@@ -1156,56 +1156,22 @@ $("statsPityDistribution").innerHTML = poolRecords.length
       `;
     }).join("")
   : '<p class="muted">尚無五星紀錄</p>'; 
+
  // 出金運氣分析
 const luckLimit = selectedStatsPool === "lightcone" ? 80 : 90;
-const isLightcone = selectedStatsPool === "lightcone";
-
-function getLuckProbability(pity) {
-  let survival = 1;
-
-  for (let i = 1; i <= pity; i++) {
-    let probability;
-
-    if (i >= luckLimit) {
-      probability = 1;
-    } else if (isLightcone) {
-      probability = i < 67
-        ? 0.008
-        : Math.min(1, 0.008 + (i - 66) * 0.07);
-    } else {
-      probability = i < 74
-        ? 0.006
-        : Math.min(1, 0.006 + (i - 73) * 0.06);
-    }
-
-    survival *= (1 - probability);
-  }
-
-  return (1 - survival) * 100;
-}
-
-function getLuckCategory(percent) {
-  if (percent <= 25) return "歐皇降臨";
-  if (percent <= 50) return "歐氣滿滿";
-  if (percent <= 75) return "正常發揮";
-  if (percent <= 90) return "非氣纏身";
-  return "非酋附體";
-}
 
 const luckRecords = poolRecords
   .map(record => {
-    const pity = Number(record.pity);
+    const result = calculateLuck(record.pity, selectedStatsPool);
 
-    if (!Number.isFinite(pity) || pity < 1 || pity > luckLimit) {
+    if (!result) {
       return null;
     }
 
-    const probability = getLuckProbability(pity);
-
     return {
       ...record,
-      luckProbability: probability,
-      luckCategory: getLuckCategory(probability)
+      luckProbability: result.chance,
+      luckCategory: result.label
     };
   })
   .filter(Boolean);
@@ -1259,7 +1225,8 @@ $("statsLuckAnalysis").innerHTML = luckTotal
       </div>
     `).join("")}
   `
-  : '<p class="muted">尚無五星紀錄</p>'; 
+  : '<p class="muted">尚無五星紀錄</p>';
+
  const sorted=[...records].sort((a,b)=>{
   const dateCompare=b.date.localeCompare(a.date);
   if(dateCompare!==0) return dateCompare;
