@@ -358,6 +358,10 @@ function getGameIcon(name){
 }
   
 let poolStates = {};
+let plannerResources = {
+  stellar_jade: 0,
+  special_passes: 0
+};  
 let selectedStatsPool = "character";
 let user = null;
 const poolNames={
@@ -484,6 +488,40 @@ const versionRecords=records.filter(r=>
       }).join("")
     : '<div class="empty">目前沒有版本紀錄。</div>';
 }
+
+
+function updatePlannerResourceSummary(){
+  const jade = Math.max(
+    0,
+    Math.floor(Number($("plannerJade").value) || 0)
+  );
+
+  const passes = Math.max(
+    0,
+    Math.floor(Number($("plannerPasses").value) || 0)
+  );
+
+  const jadePulls = Math.floor(jade / 160);
+  const totalPulls = jadePulls + passes;
+
+  $("plannerJadePulls").textContent = jadePulls;
+  $("plannerPassPulls").textContent = passes;
+  $("plannerTotalPulls").textContent = totalPulls;
+}
+
+$("plannerJade").addEventListener(
+  "input",
+  updatePlannerResourceSummary
+);
+
+$("plannerPasses").addEventListener(
+  "input",
+  updatePlannerResourceSummary
+);
+
+updatePlannerResourceSummary();
+
+  
 function render(){
  const poolRecords = records.filter(r => r.pool === selectedStatsPool);
 
