@@ -1146,7 +1146,7 @@ function calculateCharacterAnalysis(characterName) {
     (sum, r) => sum + Number(r.pity || 0),
     0
   );
-
+  const totalFiveStars = history.length;
   
   // 計算每次取得指定角色所花費的抽數
   const acquisitionDetails = [];
