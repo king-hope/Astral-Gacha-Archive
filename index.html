@@ -1639,17 +1639,24 @@ $("showChartBtn").addEventListener("click",()=>{
   $("recordTable").classList.add("hidden");
   $("recordChart").classList.remove("hidden");
 });
-$("statsPoolTabs").addEventListener("click", e => {
-  const button = e.target.closest("button[data-stats-pool]");
-  if (!button) return;
+["statsPoolTabs", "analysisStatsPoolTabs"].forEach(id => {
+  $(id).addEventListener("click", e => {
+    const button = e.target.closest("button[data-stats-pool]");
+    if (!button) return;
 
-  selectedStatsPool = button.dataset.statsPool;
+    selectedStatsPool = button.dataset.statsPool;
 
-  document.querySelectorAll("#statsPoolTabs button").forEach(btn => {
-    btn.classList.toggle("active", btn === button);
+    document.querySelectorAll(
+      "#statsPoolTabs button, #analysisStatsPoolTabs button"
+    ).forEach(btn => {
+      btn.classList.toggle(
+        "active",
+        btn.dataset.statsPool === selectedStatsPool
+      );
+    });
+
+    render();
   });
-
-  render();
 });
 
   const gameVersionDates = [
