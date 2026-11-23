@@ -484,7 +484,15 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <section id="settings" class="hidden"><div class="panel"><h2>帳號與資料</h2>
 <p id="cloudInfo" class="muted">尚未設定 Supabase。請依照下載包內 README 設定專案網址與公開 anon key。</p><div class="row"><button id="exportBtn">匯出 JSON 備份</button>
 <button id="importBtn">匯入 JSON 備份</button>
-<input id="importFile" type="file" accept=".json,application/json" hidden><button id="exportCsvBtn">匯出 CSV</button>
+<input id="importFile" type="file" accept=".json,application/json" hidden>
+<button id="importGachaBtn">匯入 UIGF／SRGF</button>
+<input
+  id="importGachaFile"
+  type="file"
+  accept=".json,application/json"
+  hidden
+>  
+<button id="exportCsvBtn">匯出 CSV</button>
 <button id="exportPoolStatesBtn">匯出保底狀態</button><button id="logoutBtn">登出</button></div>
 <p class="hint">資料匯出功能可在本機預覽模式使用。正式雲端版會依登入帳號讀取資料。</p></div><div class="panel"><h2>版本花費統計（下一階段）</h2>
 <p class="muted">預計加入版本、購買項目、金額、幣別及免費／付費星瓊分流。此版先建立五星與保底紀錄核心。</p></div></section>
