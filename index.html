@@ -492,6 +492,25 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
   accept=".json,application/json"
   hidden
 >  
+<script>
+$("importGachaFile").addEventListener("change", async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    console.log("抽卡紀錄匯入檔案內容：", data);
+    alert("檔案讀取成功！請開啟瀏覽器開發者工具查看格式。");
+  } catch (error) {
+    alert("檔案讀取失敗，請確認是否為有效的 JSON 檔案。");
+    console.error(error);
+  }
+
+  event.target.value = "";
+});
+</script>  
 <button id="exportCsvBtn">匯出 CSV</button>
 <button id="exportPoolStatesBtn">匯出保底狀態</button><button id="logoutBtn">登出</button></div>
 <p class="hint">資料匯出功能可在本機預覽模式使用。正式雲端版會依登入帳號讀取資料。</p></div><div class="panel"><h2>版本花費統計（下一階段）</h2>
