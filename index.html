@@ -1081,7 +1081,6 @@ function calculateLuck(pity, pool) {
 }
 
 
-
 function calculateStreakStats(pool) {
   const history = records
     .filter(r =>
@@ -1100,72 +1099,100 @@ function calculateStreakStats(pool) {
     });
 
   let guaranteed = false;
+
   let currentLoss = 0;
   let currentWin = 0;
+
   let maxLoss = 0;
   let maxWin = 0;
+
+  let totalLosses = 0;
+  let totalWins = 0;
 
   const lossDistribution = {};
   const winDistribution = {};
   const attempts = [];
   const anomalies = [];
 
-  function finishLossStreak() {
+  history.forEach(record => {
+    // 歪卡：小保底判定失敗
+    if (record.result === "off") {
+      if (guaranteed) {
+        anomalies.push(record);
+        attempts.push({
+          record,
+          status: "error"
+        });
+        return;
+      }
+
+      // 結束上一段連續不歪
+      if (currentWin > 0) {
+        winDistribution[currentWin] =
+          (winDistribution[currentWin] || 0) + 1;
+        currentWin = 0;
+      }
+
+      guaranteed = true;
+      currentLoss++;
+      totalLosses++;
+
+      maxLoss = Math.max(maxLoss, currentLoss);
+
+      attempts.push({
+        record,
+        status: "loss"
+      });
+
+      return;
+    }
+
+    // 大保底 UP：不參與勝負，也不中斷連續紀錄
+    if (guaranteed) {
+      guaranteed = false;
+
+      attempts.push({
+        record,
+        status: "guaranteed"
+      });
+
+      return;
+    }
+
+    // 小保底 UP：判定成功
     if (currentLoss > 0) {
       lossDistribution[currentLoss] =
         (lossDistribution[currentLoss] || 0) + 1;
       currentLoss = 0;
     }
-  }
-
-  function finishWinStreak() {
-    if (currentWin > 0) {
-      winDistribution[currentWin] =
-        (winDistribution[currentWin] || 0) + 1;
-      currentWin = 0;
-    }
-  }
-
-  history.forEach(record => {
-    if (record.result === "off") {
-      if (guaranteed) {
-        anomalies.push(record);
-        attempts.push({ record, status: "error" });
-        return;
-      }
-
-      finishWinStreak();
-
-      guaranteed = true;
-      currentLoss++;
-      maxLoss = Math.max(maxLoss, currentLoss);
-
-      attempts.push({ record, status: "loss" });
-      return;
-    }
-
-    if (guaranteed) {
-      finishLossStreak();
-      finishWinStreak();
-
-      guaranteed = false;
-      attempts.push({ record, status: "guaranteed" });
-      return;
-    }
-
-    finishLossStreak();
 
     currentWin++;
+    totalWins++;
+
     maxWin = Math.max(maxWin, currentWin);
 
-    attempts.push({ record, status: "win" });
+    attempts.push({
+      record,
+      status: "win"
+    });
   });
 
-  finishLossStreak();
-  finishWinStreak();
+  // 將最後尚未中斷的連續紀錄也納入歷史分布
+  if (currentLoss > 0) {
+    lossDistribution[currentLoss] =
+      (lossDistribution[currentLoss] || 0) + 1;
+  }
+
+  if (currentWin > 0) {
+    winDistribution[currentWin] =
+      (winDistribution[currentWin] || 0) + 1;
+  }
 
   return {
     totalRecords: history.length,
+    totalAttempts: totalLosses + totalWins,
+    totalLosses,
+    totalWins,
     currentLoss,
     currentWin,
     maxLoss,
@@ -1177,8 +1204,6 @@ function calculateStreakStats(pool) {
   };
 }
 
-
-  
 function render(){
  const poolRecords = records.filter(r => r.pool === selectedStatsPool);
 
