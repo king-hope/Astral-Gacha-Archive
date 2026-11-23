@@ -1193,11 +1193,15 @@ function calculateCharacterAnalysis(characterName) {
     ? completedCost / acquisitions.length
     : null;
 
-  const averagePity = acquisitionDetails.length
-  ? acquisitionDetails.reduce(
-      (sum, item) => sum + Number(item.record.pity || 0),
+  const completedRecords = acquisitionDetails.flatMap(
+  item => item.history
+);
+
+const averagePity = completedRecords.length
+  ? completedRecords.reduce(
+      (sum, record) => sum + Number(record.pity || 0),
       0
-    ) / acquisitionDetails.length
+    ) / completedRecords.length
   : null;
 
   const maxRank = acquisitions.length
