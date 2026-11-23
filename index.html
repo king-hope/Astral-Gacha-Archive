@@ -1430,68 +1430,81 @@ if (selectedStatsPool === "standard") {
     : "50/50";
 
   
-$("statsStreakAnalysis").innerHTML = streakStats.totalRecords
+
+$("statsStreakAnalysis").innerHTML = streakStats.totalAttempts
   ? `
     <p class="muted">
       ${selectedStatsPool === "lightcone" ? "光錐活動" : "角色活動"}
-      ・${streakLabel} 實際判定紀錄
+      ・有效小保底判定 ${streakStats.totalAttempts} 次
     </p>
 
     <div class="grid">
       <div class="stat">
-        <small>最長連續歪卡</small>
-        <strong>${streakStats.maxLoss} 次</strong>
+        <small>小保底不歪</small>
+        <strong style="color:#4C9B78;">
+          ${streakStats.currentWin} 次
+        </strong>
+        <p class="muted" style="margin:5px 0 0;">
+          歷史最長 ${streakStats.maxWin} 次
+        </p>
+        <p class="muted" style="margin:3px 0 0;">
+          歷史比例 ${
+            (streakStats.totalWins / streakStats.totalAttempts * 100).toFixed(1)
+          }%
+        </p>
       </div>
 
       <div class="stat">
-        <small>最長連續命中</small>
-        <strong>${streakStats.maxWin} 次</strong>
-      </div>
-
-      <div class="stat">
-        <small>目前連續歪卡</small>
-        <strong>${streakStats.currentLoss} 次</strong>
-      </div>
-
-      <div class="stat">
-        <small>目前連續命中</small>
-        <strong>${streakStats.currentWin} 次</strong>
+        <small>小保底歪卡</small>
+        <strong style="color:#D97878;">
+          ${streakStats.currentLoss} 次
+        </strong>
+        <p class="muted" style="margin:5px 0 0;">
+          歷史最長 ${streakStats.maxLoss} 次
+        </p>
+        <p class="muted" style="margin:3px 0 0;">
+          歷史比例 ${
+            (streakStats.totalLosses / streakStats.totalAttempts * 100).toFixed(1)
+          }%
+        </p>
       </div>
     </div>
 
+    <p class="muted" style="margin-top:12px;">
+      大保底 UP 不列入勝負判定，也不影響連續紀錄。
+    </p>
+
     <details style="margin-top:16px;">
       <summary style="cursor:pointer;font-weight:600;">
-        查看歷史連續歪卡分布
+        查看歷史連續紀錄分布
       </summary>
 
       <div style="margin-top:12px;">
-        ${Object.keys(streakStats.lossDistribution)
-          .map(Number)
-          .sort((a,b) => a-b)
-          .map(count => `
-            <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);">
-              <span>連歪 ${count} 次</span>
-              <strong>${streakStats.lossDistribution[count]} 段</strong>
-            </div>
-          `).join("") || '<p class="muted">尚無連續歪卡紀錄</p>'}
-      </div>
-    </details>
+        <strong style="color:#4C9B78;">小保底不歪</strong>
 
-    <details style="margin-top:12px;">
-      <summary style="cursor:pointer;font-weight:600;">
-        查看歷史連續命中分布
-      </summary>
-
-      <div style="margin-top:12px;">
         ${Object.keys(streakStats.winDistribution)
           .map(Number)
           .sort((a,b) => a-b)
           .map(count => `
             <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);">
-              <span>連續命中 ${count} 次</span>
-              <strong>${streakStats.winDistribution[count]} 段</strong>
+              <span>連續不歪 ${count} 次</span>
+              <strong>共 ${streakStats.winDistribution[count]} 組</strong>
             </div>
-          `).join("") || '<p class="muted">尚無連續命中紀錄</p>'}
+          `).join("") || '<p class="muted">尚無連續不歪紀錄</p>'}
+
+        <div style="height:16px;"></div>
+
+        <strong style="color:#D97878;">小保底歪卡</strong>
+
+        ${Object.keys(streakStats.lossDistribution)
+          .map(Number)
+          .sort((a,b) => a-b)
+          .map(count => `
+            <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);">
+              <span>連續歪卡 ${count} 次</span>
+              <strong>共 ${streakStats.lossDistribution[count]} 組</strong>
+            </div>
+          `).join("") || '<p class="muted">尚無連續歪卡紀錄</p>'}
       </div>
     </details>
 
@@ -1503,7 +1516,15 @@ $("statsStreakAnalysis").innerHTML = streakStats.totalRecords
       `
       : ""}
   `
-  : '<p class="muted">尚無可供判定的五星紀錄</p>';
+  : `
+    <p class="muted">
+      尚無有效的小保底判定紀錄。
+    </p>
+    ${streakStats.anomalies.length
+      ? `<p style="color:#D97878;">發現 ${streakStats.anomalies.length} 筆保底狀態異常紀錄。</p>`
+      : ""}
+  `;
+
 
 }
 
