@@ -1147,37 +1147,52 @@ function calculateCharacterAnalysis(characterName) {
     0
   );
 
+  
   // 計算每次取得指定角色所花費的抽數
-  let pendingCost = 0;
-  let completedCost = 0;
-  let pendingRecords = [];
-
   const acquisitionDetails = [];
 
-  history.forEach(record => {
-  pendingCost += Number(record.pity || 0);
-  pendingRecords.push(record);
-
+  history.forEach((record, index) => {
     if (
       record.result === "up" &&
       record.item_name?.trim() === characterName
     ) {
-      acquisitionDetails.push({
-  record,
-  cost: pendingCost,
-  luck: calculateLuck(record.pity, "character"),
-  history: [...pendingRecords]
-});
+      // 只在前一筆五星紀錄是歪卡時，將歪卡抽數納入成本
+      const previousRecord = history[index - 1];
 
-completedCost += pendingCost;
-pendingCost = 0;
-pendingRecords = [];
+      const includedRecords =
+        previousRecord?.result === "off"
+          ? [previousRecord, record]
+          : [record];
+
+      const cost = includedRecords.reduce(
+        (sum, r) => sum + Number(r.pity || 0),
+        0
+      );
+
+      acquisitionDetails.push({
+        record,
+        cost,
+        luck: calculateLuck(record.pity, "character"),
+        history: includedRecords
+      });
     }
   });
 
   const costs = acquisitionDetails.map(item => item.cost);
 
-  const totalFiveStars = history.length;
+  // 若最新一筆五星是歪卡，代表目前持有大保底
+  const lastRecord = history[history.length - 1];
+
+  const pendingCost =
+    lastRecord?.result === "off"
+      ? Number(lastRecord.pity || 0)
+      : 0;
+
+  const completedCost = costs.reduce(
+    (sum, cost) => sum + cost,
+    0
+  );
+
 
   const averageCost = acquisitions.length
     ? completedCost / acquisitions.length
