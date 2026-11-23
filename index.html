@@ -1384,9 +1384,54 @@ $("statsLuckAnalysis").innerHTML = luckTotal
 </details>
 
   `
+  
   : '<p class="muted">尚無五星紀錄</p>';
 
+// 連續歪卡／不歪統計
+if (selectedStatsPool === "standard") {
+  $("statsStreakAnalysis").innerHTML =
+    '<p class="muted">常駐卡池沒有大小保底判定，因此不適用連續歪卡統計。</p>';
+} else {
+  const streakStats = calculateStreakStats(selectedStatsPool);
+
+  const streakLabel = selectedStatsPool === "lightcone"
+    ? "75/25"
+    : "50/50";
+
+  $("statsStreakAnalysis").innerHTML = streakStats.totalRecords
+    ? `
+      <p class="muted">
+        ${selectedStatsPool === "lightcone" ? "光錐活動" : "角色活動"}
+        ・${streakLabel} 實際判定紀錄
+      </p>
+
+      <div class="grid">
+        <div class="stat">
+          <small>最長連續歪卡</small>
+          <strong>${streakStats.maxLoss} 次</strong>
+        </div>
+
+        <div class="stat">
+          <small>最長連續命中</small>
+          <strong>${streakStats.maxWin} 次</strong>
+        </div>
+
+        <div class="stat">
+          <small>目前連續歪卡</small>
+          <strong>${streakStats.currentLoss} 次</strong>
+        </div>
+
+        <div class="stat">
+          <small>目前連續命中</small>
+          <strong>${streakStats.currentWin} 次</strong>
+        </div>
+      </div>
+    `
+    : '<p class="muted">尚無可供判定的五星紀錄</p>';
+}
+
  const sorted=[...records].sort((a,b)=>{
+
   const dateCompare=b.date.localeCompare(a.date);
   if(dateCompare!==0) return dateCompare;
   return (b.sort_order??0)-(a.sort_order??0);
