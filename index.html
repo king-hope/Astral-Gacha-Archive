@@ -1392,13 +1392,13 @@ function renderCharacterAnalysis() {
           <details style="margin:12px 0;padding:12px;border:1px solid var(--border);border-radius:10px;">
             <summary style="cursor:pointer;">
               第 ${index + 1} 次取得｜${esc(record.date)}
-              ｜E${Number(record.rank) || 0}
+              ｜${Number(record.rank) || 0} 星魂
               ｜${item.cost} 抽
             </summary>
 
             <div style="margin-top:12px;">
               <p>遊戲版本：${esc(record.game_version || "未記錄")}</p>
-              <p>取得星魂：E${Number(record.rank) || 0}</p>
+              <p>取得星魂：${Number(record.rank) || 0} 星魂</p>
               <p>本次取得花費：${item.cost} 抽</p>
               <p>本次出金抽數：${record.pity} 抽</p>
               <p>出金運氣：${item.luck?.label || "無法計算"}</p>
