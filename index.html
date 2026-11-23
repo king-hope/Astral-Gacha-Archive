@@ -1445,7 +1445,7 @@ function renderCharacterAnalysis() {
                     <tr>
                       <td>${esc(record.date)}</td>
                       <td>${esc(record.item_name)}</td>
-                      <td>${record.result === "off" ? "歪卡" : "UP"}</td>
+                      <td>${record.result === "off" ? "歪卡（未取得）" : "UP（取得當期角色）"}</td>
                       <td>${record.pity} 抽</td>
                       <td>${cumulative} 抽</td>
                     </tr>
