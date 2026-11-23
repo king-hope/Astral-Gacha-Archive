@@ -1193,9 +1193,12 @@ function calculateCharacterAnalysis(characterName) {
     ? completedCost / acquisitions.length
     : null;
 
-  const averagePity = totalFiveStars
-    ? totalPulls / totalFiveStars
-    : null;
+  const averagePity = acquisitionDetails.length
+  ? acquisitionDetails.reduce(
+      (sum, item) => sum + Number(item.record.pity || 0),
+      0
+    ) / acquisitionDetails.length
+  : null;
 
   const maxRank = acquisitions.length
     ? Math.max(
