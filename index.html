@@ -1259,6 +1259,88 @@ function renderCharacterAnalysisSelect() {
 }
 
 
+function renderCharacterAnalysis() {
+  const container = $("characterAnalysisContent");
+  const name = selectedAnalysisCharacter;
+
+  if (!name) {
+    container.innerHTML = `
+      <div class="panel">
+        <p class="muted">請先選擇一名角色以查看分析。</p>
+      </div>
+    `;
+    return;
+  }
+
+  const stats = calculateCharacterAnalysis(name);
+
+  if (!stats || !stats.acquisitionCount) {
+    container.innerHTML = `
+      <div class="panel">
+        <p class="muted">目前沒有這名角色的取得紀錄。</p>
+      </div>
+    `;
+    return;
+  }
+
+  const statCards = [
+    {
+      label: "取得次數",
+      value: `${stats.acquisitionCount} 次`
+    },
+    {
+      label: "依紀錄推算持有",
+      value: `${stats.estimatedCopies} 隻（E${stats.maxRank}）`
+    },
+    {
+      label: "累積投入抽數",
+      value: `${stats.totalPulls.toLocaleString()} 抽`
+    },
+    {
+      label: "平均取得花費",
+      value: `${stats.averageCost.toFixed(1)} 抽／次`
+    },
+    {
+      label: "平均出金抽數",
+      value: `${stats.averagePity.toFixed(1)} 抽／次`
+    },
+    {
+      label: "最低取得花費",
+      value: `${stats.minCost} 抽`
+    },
+    {
+      label: "最高取得花費",
+      value: `${stats.maxCost} 抽`
+    }
+  ];
+
+  container.innerHTML = `
+    <div class="panel">
+      <h2>${esc(name)}・取得概況</h2>
+
+      <div class="grid">
+        ${statCards.map(item => `
+          <div class="stat">
+            <small>${item.label}</small>
+            <strong>${item.value}</strong>
+          </div>
+        `).join("")}
+      </div>
+
+      <p class="muted" style="margin-top:12px;">
+        星魂與持有數量依目前已登錄的取得紀錄推算。
+      </p>
+
+      ${stats.pendingCost > 0 ? `
+        <p class="muted">
+          尚未完成下一次取得的投入抽數：${stats.pendingCost} 抽
+        </p>
+      ` : ""}
+    </div>
+  `;
+}
+
+
 function calculateStreakStats(pool) {
   const history = records
     .filter(r =>
