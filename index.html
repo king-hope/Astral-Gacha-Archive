@@ -1104,6 +1104,19 @@ function calculateLuck(pity, pool) {
   };
 }
 
+function getAnalysisCharacters() {
+  return [...new Set(
+    records
+      .filter(r =>
+        r.pool === "character" &&
+        r.result === "up" &&
+        r.item_name
+      )
+      .map(r => r.item_name.trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, "zh-Hant"));
+}
+
 
 function calculateStreakStats(pool) {
   const history = records
