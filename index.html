@@ -1080,6 +1080,99 @@ function calculateLuck(pity, pool) {
   };
 }
 
+
+function calculateStreakStats(pool) {
+  const limit = pool === "lightcone" ? 80 : 90;
+
+  const history = records
+    .filter(r =>
+      r.pool === pool &&
+      (r.result === "up" || r.result === "off")
+    )
+    .slice()
+    .sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+
+      return (
+        (Number(a.sort_order) || 0) -
+        (Number(b.sort_order) || 0)
+      );
+    });
+
+  let guaranteed = false;
+  let currentLoss = 0;
+  let currentWin = 0;
+  let maxLoss = 0;
+  let maxWin = 0;
+
+  const lossDistribution = {};
+  const winDistribution = {};
+  const attempts = [];
+
+  history.forEach(record => {
+    if (record.result === "off") {
+      if (guaranteed) {
+        attempts.push({
+          record,
+          status: "error"
+        });
+        return;
+      }
+
+      guaranteed = true;
+      currentLoss++;
+      currentWin = 0;
+
+      maxLoss = Math.max(maxLoss, currentLoss);
+
+      lossDistribution[currentLoss] =
+        (lossDistribution[currentLoss] || 0) + 1;
+
+      attempts.push({
+        record,
+        status: "loss"
+      });
+
+      return;
+    }
+
+    if (guaranteed) {
+      guaranteed = false;
+      attempts.push({
+        record,
+        status: "guaranteed"
+      });
+      return;
+    }
+
+    currentWin++;
+    currentLoss = 0;
+
+    maxWin = Math.max(maxWin, currentWin);
+
+    winDistribution[currentWin] =
+      (winDistribution[currentWin] || 0) + 1;
+
+    attempts.push({
+      record,
+      status: "win"
+    });
+  });
+
+  return {
+    totalRecords: history.length,
+    currentLoss,
+    currentWin,
+    maxLoss,
+    maxWin,
+    lossDistribution,
+    winDistribution,
+    attempts
+  };
+}
+
+  
 function render(){
  const poolRecords = records.filter(r => r.pool === selectedStatsPool);
 
