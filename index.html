@@ -2470,6 +2470,10 @@ $("importBtn").addEventListener("click",()=>{
   $("importFile").click();
 });
 
+$("importGachaBtn").addEventListener("click", () => {
+  $("importGachaFile").click();
+});
+  
 $("importFile").addEventListener("change", async e => {
   const file = e.target.files[0];
   if (!file) return;
