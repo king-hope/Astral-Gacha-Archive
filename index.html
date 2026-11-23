@@ -1331,13 +1331,45 @@ function renderCharacterAnalysis() {
         星魂與持有數量依目前已登錄的取得紀錄推算。
       </p>
 
+      
       ${stats.pendingCost > 0 ? `
         <p class="muted">
           尚未完成下一次取得的投入抽數：${stats.pendingCost} 抽
         </p>
       ` : ""}
     </div>
+
+    <div class="panel">
+      <h2>取得運氣分析</h2>
+      <p class="muted">
+        僅統計指定角色實際 UP 取得時的出金抽數。
+        使用非官方機率模型，結果僅供參考。
+      </p>
+
+      ${stats.acquisitionCount ? `
+        ${stats.luckCategories.map(category => {
+          const count = stats.luckDistribution[category];
+          const percent = count / stats.acquisitionCount * 100;
+
+          return `
+            <div style="margin:14px 0;">
+              <div style="display:flex;justify-content:space-between;gap:12px;">
+                <strong>${category}</strong>
+                <span>${count} 次（${percent.toFixed(1)}%）</span>
+              </div>
+
+              <div style="height:9px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:7px;">
+                <div style="height:100%;width:${percent}%;background:#8996D4;border-radius:99px;"></div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      ` : `
+        <p class="muted">尚無取得紀錄。</p>
+      `}
+    </div>
   `;
+
 }
 
 
