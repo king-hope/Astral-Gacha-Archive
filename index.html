@@ -1233,6 +1233,28 @@ function calculateCharacterAnalysis(characterName) {
 }
 
 
+function renderCharacterAnalysisSelect() {
+  const select = $("characterAnalysisSelect");
+  const characters = getAnalysisCharacters();
+
+  const previousValue = selectedAnalysisCharacter;
+
+  select.innerHTML = `
+    <option value="">請選擇角色</option>
+    ${characters.map(name => `
+      <option value="${esc(name)}">${esc(name)}</option>
+    `).join("")}
+  `;
+
+  if (characters.includes(previousValue)) {
+    select.value = previousValue;
+  } else {
+    selectedAnalysisCharacter = "";
+    select.value = "";
+  }
+}
+
+
 function calculateStreakStats(pool) {
   const history = records
     .filter(r =>
