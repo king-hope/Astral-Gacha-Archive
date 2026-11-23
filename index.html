@@ -1118,6 +1118,121 @@ function getAnalysisCharacters() {
 }
 
 
+function calculateCharacterAnalysis(characterName) {
+  if (!characterName) return null;
+
+  // 依日期與同日抽取順序排列角色活動紀錄
+  const history = records
+    .filter(r => r.pool === "character")
+    .slice()
+    .sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+
+      return (
+        (Number(a.sort_order) || 0) -
+        (Number(b.sort_order) || 0)
+      );
+    });
+
+  // 指定角色的 UP 取得紀錄
+  const acquisitions = history.filter(r =>
+    r.result === "up" &&
+    r.item_name?.trim() === characterName
+  );
+
+  // 累計所有角色活動五星紀錄的抽數
+  const totalPulls = history.reduce(
+    (sum, r) => sum + Number(r.pity || 0),
+    0
+  );
+
+  // 計算每次取得指定角色所花費的抽數
+  let pendingCost = 0;
+  let completedCost = 0;
+
+  const acquisitionDetails = [];
+
+  history.forEach(record => {
+    pendingCost += Number(record.pity || 0);
+
+    if (
+      record.result === "up" &&
+      record.item_name?.trim() === characterName
+    ) {
+      acquisitionDetails.push({
+        record,
+        cost: pendingCost,
+        luck: calculateLuck(record.pity, "character")
+      });
+
+      completedCost += pendingCost;
+      pendingCost = 0;
+    }
+  });
+
+  const costs = acquisitionDetails.map(item => item.cost);
+
+  const totalFiveStars = history.length;
+
+  const averageCost = acquisitions.length
+    ? completedCost / acquisitions.length
+    : null;
+
+  const averagePity = totalFiveStars
+    ? totalPulls / totalFiveStars
+    : null;
+
+  const maxRank = acquisitions.length
+    ? Math.max(
+        ...acquisitions.map(r => Number(r.rank) || 0)
+      )
+    : null;
+
+  // 指定角色取得時的運氣分類
+  const luckCategories = [
+    "歐皇降臨",
+    "歐氣滿滿",
+    "正常發揮",
+    "非氣纏身",
+    "非酋附體"
+  ];
+
+  const luckDistribution = {};
+
+  luckCategories.forEach(category => {
+    luckDistribution[category] =
+      acquisitionDetails.filter(
+        item => item.luck?.label === category
+      ).length;
+  });
+
+  return {
+    characterName,
+    history,
+    acquisitions,
+    acquisitionDetails,
+
+    acquisitionCount: acquisitions.length,
+    maxRank,
+    estimatedCopies: maxRank === null ? 0 : maxRank + 1,
+
+    totalPulls,
+    completedCost,
+    pendingCost,
+
+    averageCost,
+    averagePity,
+
+    minCost: costs.length ? Math.min(...costs) : null,
+    maxCost: costs.length ? Math.max(...costs) : null,
+
+    luckCategories,
+    luckDistribution
+  };
+}
+
+
 function calculateStreakStats(pool) {
   const history = records
     .filter(r =>
