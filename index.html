@@ -1508,6 +1508,39 @@ $("statsStreakAnalysis").innerHTML = streakStats.totalAttempts
       </div>
     </details>
 
+    
+    <details style="margin-top:12px;">
+      <summary style="cursor:pointer;font-weight:600;">
+        查看小保底判定明細（${streakStats.totalAttempts} 次）
+      </summary>
+
+      <div style="margin-top:12px;">
+        ${streakStats.attempts
+          .filter(item =>
+            item.status === "win" ||
+            item.status === "loss"
+          )
+          .map(item => `
+            <div style="padding:12px 0;border-bottom:1px solid var(--border);">
+              <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <strong>${item.record.item_name || "未命名五星"}</strong>
+
+                <strong style="color:${item.status === "win" ? "#4C9B78" : "#D97878"};">
+                  ${item.status === "win" ? "小保底不歪" : "小保底歪卡"}
+                </strong>
+              </div>
+
+              <p class="muted" style="margin:5px 0 0;">
+                ${item.record.date || ""}
+                ・第 ${item.record.pity} 抽出金
+                ${item.record.game_version ? "・" + item.record.game_version + " 版本" : ""}
+              </p>
+            </div>
+          `).join("")}
+      </div>
+    </details>
+
+
     ${streakStats.anomalies.length
       ? `
         <p style="color:#D97878;margin-top:16px;">
