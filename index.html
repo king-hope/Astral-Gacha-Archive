@@ -1081,9 +1081,8 @@ function calculateLuck(pity, pool) {
 }
 
 
-function calculateStreakStats(pool) {
-  const limit = pool === "lightcone" ? 80 : 90;
 
+function calculateStreakStats(pool) {
   const history = records
     .filter(r =>
       r.pool === pool &&
@@ -1109,56 +1108,61 @@ function calculateStreakStats(pool) {
   const lossDistribution = {};
   const winDistribution = {};
   const attempts = [];
+  const anomalies = [];
+
+  function finishLossStreak() {
+    if (currentLoss > 0) {
+      lossDistribution[currentLoss] =
+        (lossDistribution[currentLoss] || 0) + 1;
+      currentLoss = 0;
+    }
+  }
+
+  function finishWinStreak() {
+    if (currentWin > 0) {
+      winDistribution[currentWin] =
+        (winDistribution[currentWin] || 0) + 1;
+      currentWin = 0;
+    }
+  }
 
   history.forEach(record => {
     if (record.result === "off") {
       if (guaranteed) {
-        attempts.push({
-          record,
-          status: "error"
-        });
+        anomalies.push(record);
+        attempts.push({ record, status: "error" });
         return;
       }
 
+      finishWinStreak();
+
       guaranteed = true;
       currentLoss++;
-      currentWin = 0;
-
       maxLoss = Math.max(maxLoss, currentLoss);
 
-      lossDistribution[currentLoss] =
-        (lossDistribution[currentLoss] || 0) + 1;
-
-      attempts.push({
-        record,
-        status: "loss"
-      });
-
+      attempts.push({ record, status: "loss" });
       return;
     }
 
     if (guaranteed) {
+      finishLossStreak();
+      finishWinStreak();
+
       guaranteed = false;
-      attempts.push({
-        record,
-        status: "guaranteed"
-      });
+      attempts.push({ record, status: "guaranteed" });
       return;
     }
 
-    currentWin++;
-    currentLoss = 0;
+    finishLossStreak();
 
+    currentWin++;
     maxWin = Math.max(maxWin, currentWin);
 
-    winDistribution[currentWin] =
-      (winDistribution[currentWin] || 0) + 1;
-
-    attempts.push({
-      record,
-      status: "win"
-    });
+    attempts.push({ record, status: "win" });
   });
+
+  finishLossStreak();
+  finishWinStreak();
 
   return {
     totalRecords: history.length,
@@ -1168,9 +1172,11 @@ function calculateStreakStats(pool) {
     maxWin,
     lossDistribution,
     winDistribution,
-    attempts
+    attempts,
+    anomalies
   };
 }
+
 
   
 function render(){
