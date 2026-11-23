@@ -1150,24 +1150,28 @@ function calculateCharacterAnalysis(characterName) {
   // 計算每次取得指定角色所花費的抽數
   let pendingCost = 0;
   let completedCost = 0;
+  let pendingRecords = [];
 
   const acquisitionDetails = [];
 
   history.forEach(record => {
-    pendingCost += Number(record.pity || 0);
+  pendingCost += Number(record.pity || 0);
+  pendingRecords.push(record);
 
     if (
       record.result === "up" &&
       record.item_name?.trim() === characterName
     ) {
       acquisitionDetails.push({
-        record,
-        cost: pendingCost,
-        luck: calculateLuck(record.pity, "character")
-      });
+  record,
+  cost: pendingCost,
+  luck: calculateLuck(record.pity, "character"),
+  history: [...pendingRecords]
+});
 
-      completedCost += pendingCost;
-      pendingCost = 0;
+completedCost += pendingCost;
+pendingCost = 0;
+pendingRecords = [];
     }
   });
 
