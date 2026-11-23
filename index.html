@@ -1271,14 +1271,12 @@ function renderCharacterAnalysisSelect() {
     selectedAnalysisCharacter = "";
     select.value = "";
   }
-  
-  $("characterAnalysisSelect").addEventListener("change", event => {
-  selectedAnalysisCharacter = event.target.value;
-  renderCharacterAnalysis();
-});
-  
 }
 
+$("characterAnalysisSelect").addEventListener("change", event => {
+  selectedAnalysisCharacter = event.target.value;
+  renderCharacterAnalysis();
+});  
 
 function renderCharacterAnalysis() {
   const container = $("characterAnalysisContent");
