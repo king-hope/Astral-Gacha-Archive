@@ -1259,6 +1259,11 @@ function renderCharacterAnalysisSelect() {
 }
 
 
+$("characterAnalysisSelect").addEventListener("change", event => {
+  selectedAnalysisCharacter = event.target.value;
+  renderCharacterAnalysis();
+});
+
 
 function renderCharacterAnalysis() {
   const container = $("characterAnalysisContent");
