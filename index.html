@@ -1141,11 +1141,6 @@ function calculateCharacterAnalysis(characterName) {
     r.item_name?.trim() === characterName
   );
 
-  // 累計所有角色活動五星紀錄的抽數
-  const totalPulls = history.reduce(
-    (sum, r) => sum + Number(r.pity || 0),
-    0
-  );
   const totalFiveStars = history.length;
   
   // 計算每次取得指定角色所花費的抽數
@@ -1192,7 +1187,7 @@ function calculateCharacterAnalysis(characterName) {
     (sum, cost) => sum + cost,
     0
   );
-
+  const totalPulls = completedCost;
 
   const averageCost = acquisitions.length
     ? completedCost / acquisitions.length
